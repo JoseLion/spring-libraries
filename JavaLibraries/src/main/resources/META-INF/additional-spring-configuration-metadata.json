@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "levelap.allowed-origins",
+    "type": "java.lang.String",
+    "description": "List of URLs allowed to access the server"
+  },
+  {
+    "name": "levelap.compress-request",
+    "type": "java.lang.String",
+    "description": "Set to true if the request body is being compressed with GZip"
+  }
+]}
