@@ -1,6 +1,5 @@
 package ec.com.levelap.base.service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.servlet.ServletException;
@@ -16,7 +15,7 @@ public abstract class BaseService<ENTITY> {
 			Boolean status = (Boolean) getStatus.invoke(obj);
 			setStatus.invoke(obj, !status);
 			return obj;
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 	}

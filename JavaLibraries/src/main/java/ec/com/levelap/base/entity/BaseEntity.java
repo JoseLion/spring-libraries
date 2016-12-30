@@ -24,10 +24,10 @@ public class BaseEntity {
 	protected Boolean status = true;
 
 	@Column(name = "creation_date", insertable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	protected Date creationDate;
+	protected Date creationDate = new Date();
 
 	@Column(name = "creation_user", insertable = false, columnDefinition = "BIGINT DEFAULT 0")
-	protected Long creationUser;
+	protected Long creationUser = 0L;
 
 	@Column(name = "update_date", updatable = false)
 	protected Date updateDate;
