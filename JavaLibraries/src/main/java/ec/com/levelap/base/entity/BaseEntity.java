@@ -20,19 +20,19 @@ public class BaseEntity {
 	@Column(name = "id", nullable = false)
 	private Long id;
 
-	@Column(insertable = false, updatable = false, nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+	@Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
 	protected Boolean status = true;
 
-	@Column(name = "creation_date", insertable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	protected Date creationDate;
+	@Column(name = "creation_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	protected Date creationDate = new Date();
 
-	@Column(name = "creation_user", insertable = false, columnDefinition = "BIGINT DEFAULT 0")
-	protected Long creationUser;
+	@Column(name = "creation_user", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+	protected Long creationUser = 0L;
 
-	@Column(name = "update_date", updatable = false)
+	@Column(name = "update_date")
 	protected Date updateDate;
 
-	@Column(name = "update_user", updatable = false)
+	@Column(name = "update_user")
 	protected Long updateUser;
 
 	public Long getId() {
@@ -85,15 +85,29 @@ public class BaseEntity {
 
 	@PrePersist
 	protected void onCreate() {
-		// Authentication ath =
+		// Authentication auth =
 		// SecurityContextHolder.getContext().getAuthentication();
-		// User usuario = (User) ath.getPrincipal();
-		// System.out.println(usuario.getId());
+		// System.out.println("PRINCIPAL: "
+		// + auth.getPrincipal());
+		// Method[] metodos = auth.getPrincipal().getClass().getMethods();
+		// for (Method metodo : metodos) {
+		// System.out.println(metodo.getName());
+		// }
+		// try {
+		// Method getIdAuth = auth.getPrincipal().getClass().getMethod("getId");
+		// Long valueId = (Long) getIdAuth.invoke(auth.getPrincipal());
+		// System.out.println("ID: " + valueId);
+		// } catch (NoSuchMethodException | SecurityException |
+		// IllegalAccessException | IllegalArgumentException |
+		// InvocationTargetException e) {
+		// e.printStackTrace();
+		this.creationUser = 0L;
+		// }
 	}
 
 	@PreUpdate
 	protected void onUpdate() {
-		this.updateDate = new Date();
-		// Actualización del usuario conectado.
+		this.setUpdateDate(new Date());
+		this.setUpdateUser(0L);
 	}
 }
