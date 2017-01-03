@@ -67,13 +67,11 @@ public class CorsFilter implements Filter {
 				}
 			}
 			
-			GZIPInputStream gzipStream = null;
-			
 			if (request != null && request.getContentLengthLong() > 0 && isCompressed) {
 				byte[] array = IOUtils.toByteArray(request.getInputStream());
 				InputStream is = new ByteArrayInputStream(array);
 				
-				gzipStream = new GZIPInputStream(is);
+				GZIPInputStream gzipStream = new GZIPInputStream(is);
 				String gzip = IOUtils.toString(gzipStream);
 				
 				if (!gzip.equals("")) {
