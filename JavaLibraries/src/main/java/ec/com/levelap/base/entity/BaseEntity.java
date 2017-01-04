@@ -13,7 +13,6 @@ import javax.persistence.PreUpdate;
 
 @MappedSuperclass
 public class BaseEntity {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -85,24 +84,7 @@ public class BaseEntity {
 
 	@PrePersist
 	protected void onCreate() {
-		// Authentication auth =
-		// SecurityContextHolder.getContext().getAuthentication();
-		// System.out.println("PRINCIPAL: "
-		// + auth.getPrincipal());
-		// Method[] metodos = auth.getPrincipal().getClass().getMethods();
-		// for (Method metodo : metodos) {
-		// System.out.println(metodo.getName());
-		// }
-		// try {
-		// Method getIdAuth = auth.getPrincipal().getClass().getMethod("getId");
-		// Long valueId = (Long) getIdAuth.invoke(auth.getPrincipal());
-		// System.out.println("ID: " + valueId);
-		// } catch (NoSuchMethodException | SecurityException |
-		// IllegalAccessException | IllegalArgumentException |
-		// InvocationTargetException e) {
-		// e.printStackTrace();
-		this.creationUser = 0L;
-		// }
+		this.setCreationUser(0L);
 	}
 
 	@PreUpdate
