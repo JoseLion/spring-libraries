@@ -1,5 +1,7 @@
 package ec.com.levelap.mail;
 
+import java.util.Map;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -15,11 +17,28 @@ public class Mail {
 	@Autowired
 	private JavaMailSender mailSender;
 
-	public void send(String subject, String textMessage, String addressesTo) throws MessagingException {
+	public void send(MailParameters param) throws MessagingException {
 		MimeMessage message = mailSender.createMimeMessage();
-		message.setSubject(subject);
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(addressesTo, false));
-		message.setContent(textMessage, "text/html");
+		for (String address : param.getRecipentTO()) {
+			message.addRecipient(Message.RecipientType.TO, new InternetAddress(address));
+		}
+		for (String address : param.getRecipentCC()) {
+			message.addRecipient(Message.RecipientType.CC, new InternetAddress(address));
+		}
+		for (String address : param.getRecipentCCO()) {
+			message.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
+		}
+		message.setSubject(param.getSubject());
+		message.setContent(param.getContent(), "text/html");
 		mailSender.send(message);
+	}
+
+	public String replaceParams(Map<String, String> params, String content) {
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			content = content.replace("{"
+					+ entry.getKey()
+					+ "}", entry.getValue());
+		}
+		return content;
 	}
 }

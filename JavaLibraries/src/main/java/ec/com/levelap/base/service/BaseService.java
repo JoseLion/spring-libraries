@@ -13,7 +13,7 @@ public abstract class BaseService<ENTITY> {
 		this.type = type;
 	}
 
-	public ENTITY changeState(ENTITY obj) throws ServletException {
+	public ENTITY changeStatus(ENTITY obj) throws ServletException {
 		try {
 			Method getStatus = this.type.getMethod("getStatus");
 			Method setStatus = this.type.getMethod("setStatus", Boolean.class);
@@ -25,7 +25,7 @@ public abstract class BaseService<ENTITY> {
 		}
 	}
 
-	public ENTITY changeState(ENTITY obj, Boolean status) throws ServletException {
+	public ENTITY changeStatus(ENTITY obj, Boolean status) throws ServletException {
 		try {
 			Method setStatus = this.type.getMethod("setStatus", Boolean.class);
 			setStatus.invoke(obj, status);
@@ -35,7 +35,7 @@ public abstract class BaseService<ENTITY> {
 		}
 	}
 
-	public ENTITY changeStateRecursively(ENTITY obj) throws ServletException {
+	public ENTITY changeStatusRecursively(ENTITY obj) throws ServletException {
 		try {
 			Method getStatus = this.type.getMethod("getStatus");
 			Boolean status = (Boolean) getStatus.invoke(obj);
@@ -63,7 +63,7 @@ public abstract class BaseService<ENTITY> {
 			if (get == null) {
 				throw new ServletException("No tree structure defined!");
 			}
-			obj = this.changeState(obj, status);
+			obj = this.changeStatus(obj, status);
 			List<ENTITY> children = (List<ENTITY>) get.invoke(obj);
 			for (ENTITY child : children) {
 				child = this.doRecursively(child, status);
