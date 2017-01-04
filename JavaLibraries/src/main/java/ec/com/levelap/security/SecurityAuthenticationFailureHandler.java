@@ -22,8 +22,11 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 	private AuthenticationFilter authenticationFilter = new AuthenticationFilter();
 	
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException, MessagingException {
+		System.out.println("FAILURE HANDLER!!!!");
 		String[] decoded = authenticationFilter.getAuthHeaderDecoded(request);
 		String username = decoded[0];
+		
+		System.out.println("DECODED: " + decoded);
 		
 		if (decoded.length == 3) {
 			if (username.isEmpty()) {
@@ -31,9 +34,16 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 			}
 			
 			if (!username.isEmpty() && Boolean.parseBoolean(decoded[2])) {
-				levelapSecurity.getConfig().resetUserPassword(username);
-				response.getWriter().print(SecurityConst.OK);
-				response.flushBuffer();
+				System.out.println("RESET PASSWORD!!!!");
+				boolean wasResetted = levelapSecurity.getConfig().resetUserPassword(username);
+				
+				if (wasResetted) {
+					response.getWriter().print(SecurityConst.OK);
+					response.flushBuffer();
+				} else {
+					response.getWriter().print(SecurityConst.USER_NOT_FOUND);
+					response.flushBuffer();
+				}
 			}
 		} else {
 			if (!username.isEmpty() && exception.getClass().isAssignableFrom(BadCredentialsException.class)) {

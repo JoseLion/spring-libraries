@@ -35,9 +35,7 @@ public class Mail {
 
 	public String replaceParams(Map<String, String> params, String content) {
 		for (Map.Entry<String, String> entry : params.entrySet()) {
-			content = content.replace("{"
-					+ entry.getKey()
-					+ "}", entry.getValue());
+			content = content.replace("{{" + entry.getKey() + "}}", entry.getValue());
 		}
 		return content;
 	}

@@ -28,5 +28,5 @@ public interface SecurityConfig {
 	
 	public Double getResetTimeHours();
 	
-	public void resetUserPassword(String username);
+	public boolean resetUserPassword(String username);
 }

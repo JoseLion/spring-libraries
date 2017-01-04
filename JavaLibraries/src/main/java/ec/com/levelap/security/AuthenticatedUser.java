@@ -11,11 +11,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class AuthenticatedUser implements UserDetails {
 	private static final long serialVersionUID = 1L;
 
-	private String user;
+	private String user = "";
 	
-	private String password;
+	private String password = "";
 	
-	private List<String> roles;
+	private List<String> roles = new ArrayList<>();
 	
 	private Boolean isLocked;
 	
@@ -27,12 +27,11 @@ public class AuthenticatedUser implements UserDetails {
 		this.isLocked = isLocked;
 	}
 
-	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		if (roles == null) {
 			return null;
 		} else {
-			List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+			List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
 			
 			for (String role : roles) {
 				authorities.add(new SimpleGrantedAuthority(role));

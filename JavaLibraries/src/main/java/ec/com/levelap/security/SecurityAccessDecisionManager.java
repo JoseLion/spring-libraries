@@ -14,8 +14,11 @@ import org.springframework.security.core.SpringSecurityMessageSource;
 public class SecurityAccessDecisionManager implements AccessDecisionManager {
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 	
+	private boolean allowIfAllAbstainDecisions = false;
+	
 	@Override
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
+		
 		int deny = 0;
 		
 		if(authentication == null) {
@@ -27,7 +30,7 @@ public class SecurityAccessDecisionManager implements AccessDecisionManager {
 		for (ConfigAttribute attribute : configAttributes) {
 			if (this.supports(attribute)) {
 				deny++;
-				
+				// Attempt to find a matching granted authority
 				for (GrantedAuthority authority : authorities) {
 					if (attribute.getAttribute().equals(authority.getAuthority())) {
 						return;
@@ -38,8 +41,12 @@ public class SecurityAccessDecisionManager implements AccessDecisionManager {
 		
 		
 		if (deny > 0) {
-			throw new AccessDeniedException(messages.getMessage(SecurityConst.ACCESS_DENIED_CODE, SecurityConst.ACCESS_DENIED_MESSAGE));
+			throw new AccessDeniedException(messages.getMessage("CustumAccessDecisionManager.accessDenied", "Access is denied"));
 		}
+		
+		// To get this far, every AccessDecisionVoter abstained
+		checkAllowIfAllAbstainDecisions();
+	
 	}
 
 	@Override
@@ -50,5 +57,27 @@ public class SecurityAccessDecisionManager implements AccessDecisionManager {
 	@Override
 	public boolean supports(Class<?> clazz) {
 		return true;
+	}
+
+	protected final void checkAllowIfAllAbstainDecisions() {
+		if (!this.isAllowIfAllAbstainDecisions()) {
+			throw new AccessDeniedException(messages.getMessage("CustomAccessDecisionManager.accessDenied", "Access is denied"));
+		}
+	}
+
+	public MessageSourceAccessor getMessages() {
+		return messages;
+	}
+
+	public void setMessages(MessageSourceAccessor messages) {
+		this.messages = messages;
+	}
+
+	public boolean isAllowIfAllAbstainDecisions() {
+		return allowIfAllAbstainDecisions;
+	}
+
+	public void setAllowIfAllAbstainDecisions(boolean allowIfAllAbstainDecisions) {
+		this.allowIfAllAbstainDecisions = allowIfAllAbstainDecisions;
 	}
 }
