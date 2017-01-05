@@ -1,8 +1,6 @@
 package ec.com.levelap.security;
 
 public interface SecurityConst {
-	public static final String USER_NOT_FOUND = "El usuario no pudo ser encontrado";
-	
 	public static final String LOGIN_BASE_URL = "/api/";
 	
 	public static final String LOGIN_USER_URL = "user";
@@ -10,10 +8,6 @@ public interface SecurityConst {
 	public static final String LOGIN_TOKEN_URL = "token";
 	
 	public static final String TOKEN_KEY = "token";
-	
-	public static final String ACCESS_DENIED_CODE = "CustumAccessDecisionManager.accessDenied";
-	
-	public static final String ACCESS_DENIED_MESSAGE = "Acceso denegado";
 	
 	public static final String ANT_REQUEST_MATCHER_METHOD = "GET";
 	
@@ -61,7 +55,11 @@ public interface SecurityConst {
 	
 	public static final String BAD_CREDENTIALS = "Usuario y/o contraseña incorrectos";
 	
+	public static final String ACCESS_DENIED = "Acceso denegado";
+	
 	public static final String USER_LOCKED = "El usuario se encuentra bloqueado. Por favor intente más tarde";
 	
 	public static final String USER_DISABLED = "El usuario al que se quiere acceder fue inactivado. Comuniquese con el admministrador del sistema";
+	
+	public static final String USER_NOT_FOUND = "Usuario no encontrado";
 }

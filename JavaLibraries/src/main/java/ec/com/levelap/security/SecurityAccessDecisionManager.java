@@ -14,20 +14,25 @@ import org.springframework.security.core.SpringSecurityMessageSource;
 public class SecurityAccessDecisionManager implements AccessDecisionManager {
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 	
+	private boolean allowIfAllAbstainDecisions = false;
+	
 	@Override
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
+		
 		int deny = 0;
 		
 		if(authentication == null) {
 			deny++;
 		}
 		
+		System.out.println("DECIDING 1...");
+		
 		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 		
 		for (ConfigAttribute attribute : configAttributes) {
 			if (this.supports(attribute)) {
 				deny++;
-				
+				// Attempt to find a matching granted authority
 				for (GrantedAuthority authority : authorities) {
 					if (attribute.getAttribute().equals(authority.getAuthority())) {
 						return;
@@ -36,10 +41,19 @@ public class SecurityAccessDecisionManager implements AccessDecisionManager {
 			}
 		}
 		
+		System.out.println("DECIDING 2...");
 		
 		if (deny > 0) {
-			throw new AccessDeniedException(messages.getMessage(SecurityConst.ACCESS_DENIED_CODE, SecurityConst.ACCESS_DENIED_MESSAGE));
+			//throw new AccessDeniedException(messages.getMessage("CustumAccessDecisionManager.accessDenied", "Access is denied"));
+			throw new AccessDeniedException(SecurityConst.ACCESS_DENIED);
 		}
+		
+		System.out.println("DECIDING 3...");
+		
+		// To get this far, every AccessDecisionVoter abstained
+		checkAllowIfAllAbstainDecisions();
+		
+		System.out.println("DECIDING 4...");
 	}
 
 	@Override
@@ -50,5 +64,28 @@ public class SecurityAccessDecisionManager implements AccessDecisionManager {
 	@Override
 	public boolean supports(Class<?> clazz) {
 		return true;
+	}
+
+	protected final void checkAllowIfAllAbstainDecisions() {
+		if (!this.isAllowIfAllAbstainDecisions()) {
+			//throw new AccessDeniedException(messages.getMessage("CustomAccessDecisionManager.accessDenied", "Access is denied"));
+			throw new AccessDeniedException(SecurityConst.ACCESS_DENIED);
+		}
+	}
+
+	public MessageSourceAccessor getMessages() {
+		return messages;
+	}
+
+	public void setMessages(MessageSourceAccessor messages) {
+		this.messages = messages;
+	}
+
+	public boolean isAllowIfAllAbstainDecisions() {
+		return allowIfAllAbstainDecisions;
+	}
+
+	public void setAllowIfAllAbstainDecisions(boolean allowIfAllAbstainDecisions) {
+		this.allowIfAllAbstainDecisions = allowIfAllAbstainDecisions;
 	}
 }

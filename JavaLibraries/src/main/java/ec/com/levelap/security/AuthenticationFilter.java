@@ -16,7 +16,6 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-
 	protected AuthenticationFilter() {
 		super(new AntPathRequestMatcher(SecurityConst.LOGIN_BASE_URL + SecurityConst.LOGIN_USER_URL, SecurityConst.ANT_REQUEST_MATCHER_METHOD));
 	}
@@ -28,6 +27,10 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
 		if (auth == null) {
 			String username = getAuthHeaderDecoded(request)[0].trim();
 			String password = getAuthHeaderDecoded(request)[1];
+			
+			if (password.isEmpty()) {
+				password = "****";
+			}
 			
 			auth = getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		}

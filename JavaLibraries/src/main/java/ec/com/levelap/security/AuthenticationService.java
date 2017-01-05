@@ -3,12 +3,15 @@ package ec.com.levelap.security;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class AuthenticationService implements UserDetailsService {
 	@Autowired
 	private LevelapSecurity levelapSecurity;
