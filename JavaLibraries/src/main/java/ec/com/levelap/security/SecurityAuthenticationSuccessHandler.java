@@ -18,6 +18,7 @@ public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticatio
 	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+		System.out.println("********************** AUTHENTICATED!!!");
 		String username = authenticationFilter.getAuthHeaderDecoded(request)[0];
 		
 		if (levelapSecurity.getConfig().getNumberOfAttempts(username) != null) {

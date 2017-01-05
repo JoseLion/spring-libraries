@@ -3,8 +3,6 @@ package ec.com.levelap.security;
 import java.io.IOException;
 import java.util.Date;
 
-import javax.mail.MessagingException;
-import javax.naming.AuthenticationException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
@@ -21,12 +20,9 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 	
 	private AuthenticationFilter authenticationFilter = new AuthenticationFilter();
 	
-	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException, MessagingException {
-		System.out.println("FAILURE HANDLER!!!!");
+	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws AuthenticationException, IOException, ServletException {
 		String[] decoded = authenticationFilter.getAuthHeaderDecoded(request);
 		String username = decoded[0];
-		
-		System.out.println("DECODED: " + decoded);
 		
 		if (decoded.length == 3) {
 			if (username.isEmpty()) {
@@ -34,23 +30,24 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 			}
 			
 			if (!username.isEmpty() && Boolean.parseBoolean(decoded[2])) {
-				System.out.println("RESET PASSWORD!!!!");
 				boolean wasResetted = levelapSecurity.getConfig().resetUserPassword(username);
+				
+				System.out.println("WAS RESETTED? " + wasResetted);
 				
 				if (wasResetted) {
 					response.getWriter().print(SecurityConst.OK);
 					response.flushBuffer();
 				} else {
-					response.getWriter().print(SecurityConst.USER_NOT_FOUND);
-					response.flushBuffer();
+					response.sendError(HttpServletResponse.SC_UNAUTHORIZED, SecurityConst.USER_NOT_FOUND);
 				}
 			}
 		} else {
 			if (!username.isEmpty() && exception.getClass().isAssignableFrom(BadCredentialsException.class)) {
-				levelapSecurity.getConfig().setNumberOfAttempts(username, levelapSecurity.getConfig().getNumberOfAttempts(username) + 1);
 				levelapSecurity.getConfig().setLastFailedAttempt(username, new Date());
 				
 				if (levelapSecurity.getConfig().getNumberOfAttempts(username) != null) {
+					levelapSecurity.getConfig().setNumberOfAttempts(username, levelapSecurity.getConfig().getNumberOfAttempts(username) + 1);
+					
 					if (levelapSecurity.getConfig().getNumberOfAttempts(username) >= levelapSecurity.getConfig().getMaxAttempts()) {
 						levelapSecurity.getConfig().setLockDate(username, new Date());
 					}

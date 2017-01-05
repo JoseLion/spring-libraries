@@ -25,6 +25,8 @@ public class SecurityAccessDecisionManager implements AccessDecisionManager {
 			deny++;
 		}
 		
+		System.out.println("DECIDING 1...");
+		
 		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 		
 		for (ConfigAttribute attribute : configAttributes) {
@@ -39,14 +41,19 @@ public class SecurityAccessDecisionManager implements AccessDecisionManager {
 			}
 		}
 		
+		System.out.println("DECIDING 2...");
 		
 		if (deny > 0) {
-			throw new AccessDeniedException(messages.getMessage("CustumAccessDecisionManager.accessDenied", "Access is denied"));
+			//throw new AccessDeniedException(messages.getMessage("CustumAccessDecisionManager.accessDenied", "Access is denied"));
+			throw new AccessDeniedException(SecurityConst.ACCESS_DENIED);
 		}
+		
+		System.out.println("DECIDING 3...");
 		
 		// To get this far, every AccessDecisionVoter abstained
 		checkAllowIfAllAbstainDecisions();
-	
+		
+		System.out.println("DECIDING 4...");
 	}
 
 	@Override
@@ -61,7 +68,8 @@ public class SecurityAccessDecisionManager implements AccessDecisionManager {
 
 	protected final void checkAllowIfAllAbstainDecisions() {
 		if (!this.isAllowIfAllAbstainDecisions()) {
-			throw new AccessDeniedException(messages.getMessage("CustomAccessDecisionManager.accessDenied", "Access is denied"));
+			//throw new AccessDeniedException(messages.getMessage("CustomAccessDecisionManager.accessDenied", "Access is denied"));
+			throw new AccessDeniedException(SecurityConst.ACCESS_DENIED);
 		}
 	}
 

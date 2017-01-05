@@ -9,10 +9,6 @@ public interface SecurityConst {
 	
 	public static final String TOKEN_KEY = "token";
 	
-	public static final String ACCESS_DENIED_CODE = "CustumAccessDecisionManager.accessDenied";
-	
-	public static final String ACCESS_DENIED_MESSAGE = "Acceso denegado";
-	
 	public static final String ANT_REQUEST_MATCHER_METHOD = "GET";
 	
 	public static final String AUTHORIZATION_HEADER = "authorization";
@@ -58,6 +54,8 @@ public interface SecurityConst {
 	public static final String MAIL_FAILURE_MESSAGE = "No se pudo enviar el correo con la clave temporal, por favor intente nuevamente";
 	
 	public static final String BAD_CREDENTIALS = "Usuario y/o contraseña incorrectos";
+	
+	public static final String ACCESS_DENIED = "Acceso denegado";
 	
 	public static final String USER_LOCKED = "El usuario se encuentra bloqueado. Por favor intente más tarde";
 	
