@@ -21,14 +21,10 @@ public class DocumentService {
 	private String fileEnvironment;
 
 	public String saveFile(MultipartFile file, String module) throws IOException {
-		System.out.println("VARIABLE DE ENTORNO: "
-				+ fileEnvironment);
-		
 		StringBuilder path = new StringBuilder(environment.getProperty(fileEnvironment));
+		path.append(File.separator);
 		path.append(module);
-		
-		System.out.println("DIRECTORIO: " + path.toString());
-		
+
 		File directory = new File(path.toString());
 		if(!directory.exists()) {
 			directory.mkdirs();
@@ -36,13 +32,17 @@ public class DocumentService {
 		path.append(File.separator);
 		path.append(file.getOriginalFilename());
 		File serverFile = new File(path.toString());
-		
+
 		byte[] bytes = file.getBytes();
 		BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 		stream.write(bytes);
 		stream.close();
-		
-		System.out.println("DIRECTORIO DEL ARCHIVO: " + path.toString());
+
 		return path.toString();
 	}
+	
+	public MultipartFile getFile() {
+		return null;
+	}
+	
 }
