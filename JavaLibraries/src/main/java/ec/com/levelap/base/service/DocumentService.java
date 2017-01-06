@@ -21,6 +21,10 @@ public class DocumentService {
 	private String fileEnvironment;
 
 	public String saveFile(MultipartFile file, String module) throws IOException {
+		if (environment.getProperty(fileEnvironment) == null) {
+			throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO " + fileEnvironment + " EN SU EQUIPO");
+		}
+
 		StringBuilder path = new StringBuilder(environment.getProperty(fileEnvironment));
 		path.append(File.separator);
 		path.append(module);
