@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class AuthenticatedUser implements UserDetails {
 	private static final long serialVersionUID = 1L;
+	
+	private Long id = 0L;
 
 	private String user = "";
 	
@@ -19,8 +21,9 @@ public class AuthenticatedUser implements UserDetails {
 	
 	private Boolean isLocked;
 	
-	public AuthenticatedUser(String user, String password, List<String> roles, Boolean isLocked) {
+	public AuthenticatedUser(Long id, String user, String password, List<String> roles, Boolean isLocked) {
 		super();
+		this.id = id;
 		this.user = user;
 		this.password = password;
 		this.roles = roles;
@@ -73,5 +76,9 @@ public class AuthenticatedUser implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+	
+	public Long getId() {
+		return id;
 	}
 }
