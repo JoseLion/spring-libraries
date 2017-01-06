@@ -32,8 +32,6 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 			if (!username.isEmpty() && Boolean.parseBoolean(decoded[2])) {
 				boolean wasResetted = levelapSecurity.getConfig().resetUserPassword(username);
 				
-				System.out.println("WAS RESETTED? " + wasResetted);
-				
 				if (wasResetted) {
 					response.getWriter().print(SecurityConst.OK);
 					response.flushBuffer();

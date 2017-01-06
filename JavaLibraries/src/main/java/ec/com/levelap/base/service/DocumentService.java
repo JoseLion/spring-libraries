@@ -21,8 +21,9 @@ public class DocumentService {
 	private String fileEnvironment;
 
 	public String saveFile(MultipartFile file, String module) throws IOException {
-		System.out.println("VARIABLE DE ENTORNO: "
-				+ fileEnvironment);
+		if (environment.getProperty(fileEnvironment) == null) {
+			throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO " + fileEnvironment + " EN SU EQUIPO");
+		}
 		
 		StringBuilder path = new StringBuilder(environment.getProperty(fileEnvironment));
 		path.append(module);
@@ -42,7 +43,6 @@ public class DocumentService {
 		stream.write(bytes);
 		stream.close();
 		
-		System.out.println("DIRECTORIO DEL ARCHIVO: " + path.toString());
 		return path.toString();
 	}
 }
