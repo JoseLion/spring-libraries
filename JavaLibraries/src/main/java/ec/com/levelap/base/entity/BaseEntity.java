@@ -11,6 +11,9 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
+import ec.com.levelap.base.LevelapBase;
+import ec.com.levelap.base.LevelapBaseContextHolder;
+
 @MappedSuperclass
 public class BaseEntity {
 	@Id
@@ -84,12 +87,14 @@ public class BaseEntity {
 
 	@PrePersist
 	protected void onCreate() {
-		this.setCreationUser(0L);
+		LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
+		this.setCreationUser(levelap.getConfig().getCurrentUser());
 	}
 
 	@PreUpdate
 	protected void onUpdate() {
+		LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
 		this.setUpdateDate(new Date());
-		this.setUpdateUser(0L);
+		this.setUpdateUser(levelap.getConfig().getCurrentUser());
 	}
 }

@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface SecurityConfig {
+	public Long getUserId(String username);
+	
 	public String getPassword(String username);
 	
 	public List<String> getRoles(String username);

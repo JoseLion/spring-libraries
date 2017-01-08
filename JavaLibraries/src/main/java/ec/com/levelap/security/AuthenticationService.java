@@ -55,7 +55,7 @@ public class AuthenticationService implements UserDetailsService {
 			}
 		}
 		
-		return new AuthenticatedUser(username, levelapSecurity.getConfig().getPassword(username), levelapSecurity.getConfig().getRoles(username), levelapSecurity.getConfig().getIsLoked(username));
+		return new AuthenticatedUser(levelapSecurity.getConfig().getUserId(username), username, levelapSecurity.getConfig().getPassword(username), levelapSecurity.getConfig().getRoles(username), levelapSecurity.getConfig().getIsLoked(username));
 	}
 	
 	private void unlockUser(String username) {
