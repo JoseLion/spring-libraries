@@ -37,7 +37,7 @@ public class DocumentService {
 		path.append(file.getOriginalFilename());
 		File serverFile = new File(path.toString());
 		byte[] bytes = file.getBytes();
-		BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+		BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile, true));
 		stream.write(bytes);
 		stream.close();
 		return path.toString();
