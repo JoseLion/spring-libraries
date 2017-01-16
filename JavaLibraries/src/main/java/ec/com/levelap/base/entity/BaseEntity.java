@@ -16,6 +16,7 @@ import ec.com.levelap.base.LevelapBaseContextHolder;
 
 @MappedSuperclass
 public class BaseEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -97,4 +98,5 @@ public class BaseEntity {
 		this.setUpdateDate(new Date());
 		this.setUpdateUser(levelap.getConfig().getCurrentUser());
 	}
+
 }
