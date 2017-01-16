@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.servlet.Filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+	@Value("${levelap.securityEnabled}")
+	private Boolean securityEnabled;
+	
 	@Autowired
 	private AuthenticationService authenticationService;
 	
@@ -41,14 +46,18 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private SecurityAuthenticationSuccessHandler securityAuthenticationSuccessHandler;
 	
 	@Override
-    protected void configure(HttpSecurity http) throws Exception {   
-    	http.authorizeRequests()
-        .anyRequest().authenticated()
-        .and().csrf()
-        .csrfTokenRepository(csrfTokenRepository())
-        .and()
-        .addFilterBefore(usernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-		.addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);        
+    protected void configure(HttpSecurity http) throws Exception {
+		if(securityEnabled) {
+			http.authorizeRequests()
+				.anyRequest().authenticated()
+				.and().csrf()
+				.csrfTokenRepository(csrfTokenRepository())
+				.and()
+				.addFilterBefore(usernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+				.addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+		} else {
+	    	http.csrf().disable();
+		}
     }
  
     
