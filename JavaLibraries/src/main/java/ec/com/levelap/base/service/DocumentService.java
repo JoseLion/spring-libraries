@@ -55,4 +55,21 @@ public class DocumentService {
 		File serverFile = new File(path.toString());
 		return new FileInputStream(serverFile);
 	}
+	
+	public void deleteFile(String module, String fileName) throws IOException {
+		if (environment.getProperty(fileEnvironment) == null) {
+			throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO ".concat(fileEnvironment).concat(" EN SU EQUIPO"));
+		}
+		
+		StringBuilder path = new StringBuilder(environment.getProperty(fileEnvironment));
+		path.append(File.separator);
+		path.append(module);
+		path.append(File.separator);
+		path.append(fileName);
+		File file = new File(path.toString());
+		
+		if (file.exists()) {
+			file.delete();
+		}
+	}
 }
