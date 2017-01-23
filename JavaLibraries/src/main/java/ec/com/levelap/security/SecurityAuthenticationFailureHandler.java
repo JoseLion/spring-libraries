@@ -52,6 +52,8 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 				}
 			}
 			
+			response.isCommitted();
+			
 			if (exception.getClass().isAssignableFrom(BadCredentialsException.class)) {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, SecurityConst.BAD_CREDENTIALS);
 			} else if (exception.getClass().isAssignableFrom(LockedException.class)) {
