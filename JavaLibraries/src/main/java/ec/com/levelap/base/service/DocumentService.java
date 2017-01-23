@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 
@@ -85,8 +86,17 @@ public class DocumentService {
 		File serverFile = new File(path);
 		String[] split = null;
 		if (serverFile.exists()) {
+			try {
+				String[] splitAuxOpen = path.split("\\(");
+				if (splitAuxOpen != null && splitAuxOpen.length > 0) {
+					String[] splitAuxClose = splitAuxOpen[splitAuxOpen.length - 1].split("\\)");
+					if (splitAuxOpen.length > 1) {
+						counter = Integer.parseInt(splitAuxClose[splitAuxClose.length - 2]);
+					}
+				}
+			} catch (PatternSyntaxException | NumberFormatException ex) {
+			}
 			path = path.replace("(" + counter + ")", "");
-			System.out.println(path);
 			split = path.split("\\.");
 			if (split.length < 1) {
 				throw new ServletException("El archivo no contiene extensión.");
