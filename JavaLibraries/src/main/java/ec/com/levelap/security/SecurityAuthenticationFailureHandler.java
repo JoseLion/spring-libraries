@@ -23,20 +23,26 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws AuthenticationException, IOException, ServletException {
 		String[] decoded = authenticationFilter.getAuthHeaderDecoded(request);
 		String username = decoded[0];
+		response.setContentType(SecurityConst.TEXT_UTF8_HEADER);
 		
 		if (decoded.length == 3) {
 			if (username.isEmpty()) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, SecurityConst.USER_NOT_FOUND);
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.getWriter().print(SecurityConst.USER_NOT_FOUND);
+				response.flushBuffer();
 			}
 			
 			if (!username.isEmpty() && Boolean.parseBoolean(decoded[2])) {
 				boolean wasResetted = levelapSecurity.getConfig().resetUserPassword(username);
 				
 				if (wasResetted) {
+					response.setStatus(HttpServletResponse.SC_OK);
 					response.getWriter().print(SecurityConst.OK);
 					response.flushBuffer();
 				} else {
-					response.sendError(HttpServletResponse.SC_UNAUTHORIZED, SecurityConst.USER_NOT_FOUND);
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					response.getWriter().print(SecurityConst.USER_NOT_FOUND);
+					response.flushBuffer();
 				}
 			}
 		} else {
@@ -52,17 +58,19 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 				}
 			}
 			
-			response.isCommitted();
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			
 			if (exception.getClass().isAssignableFrom(BadCredentialsException.class)) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, SecurityConst.BAD_CREDENTIALS);
+				response.getWriter().print(SecurityConst.BAD_CREDENTIALS);
 			} else if (exception.getClass().isAssignableFrom(LockedException.class)) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, SecurityConst.USER_LOCKED);
+				response.getWriter().print(SecurityConst.USER_LOCKED);
 			} else if (exception.getClass().isAssignableFrom(DisabledException.class)) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, SecurityConst.USER_DISABLED);
+				response.getWriter().print(SecurityConst.USER_DISABLED);
 			} else {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "La autenticación falló: " + exception.getMessage());
+				response.getWriter().print("La autenticación falló: " + exception.getMessage());
 			}
+			
+			response.flushBuffer();
 		}
 	}
 }
