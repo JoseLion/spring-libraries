@@ -27,7 +27,8 @@ public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticatio
 				levelapSecurity.getConfig().setLastFailedAttempt(username, null);
 			}
 		}
-		
+		response.setContentType(SecurityConst.TEXT_UTF8_HEADER);
+		response.setStatus(HttpServletResponse.SC_OK);
 		response.getWriter().print(SecurityConst.OK);
         response.flushBuffer();
 	}

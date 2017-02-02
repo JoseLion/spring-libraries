@@ -62,4 +62,6 @@ public interface SecurityConst {
 	public static final String USER_DISABLED = "El usuario al que se quiere acceder fue inactivado. Comuniquese con el admministrador del sistema";
 	
 	public static final String USER_NOT_FOUND = "Usuario no encontrado";
+	
+	public static final String TEXT_UTF8_HEADER = "text/html; charset=UTF-8";
 }

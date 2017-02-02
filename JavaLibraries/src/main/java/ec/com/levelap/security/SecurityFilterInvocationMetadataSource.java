@@ -7,15 +7,17 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
+import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 
 
 public class SecurityFilterInvocationMetadataSource implements FilterInvocationSecurityMetadataSource, InitializingBean {
-	//protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
+	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 	
 	//private UrlCache urlCache;
 
@@ -44,7 +46,7 @@ public class SecurityFilterInvocationMetadataSource implements FilterInvocationS
 		
 		if (roles == null) {
 			//throw new AccessDeniedException(messages.getMessage("CustomAccessDecisionManager.accessDenied", "Access is denied"));
-			throw new AccessDeniedException(SecurityConst.ACCESS_DENIED);
+			throw new AccessDeniedException(messages.getMessage("CustomAccessDecisionManager.accessDenied", SecurityConst.ACCESS_DENIED));
 		}
 		
 		String[] stockArr = new String[roles.size()];
@@ -84,13 +86,13 @@ public class SecurityFilterInvocationMetadataSource implements FilterInvocationS
 		this.urlRoles = urlRoles;
 	}
 
-	/*public MessageSourceAccessor getMessages() {
+	public MessageSourceAccessor getMessages() {
 		return messages;
 	}
 
 	public void setMessages(MessageSourceAccessor messages) {
 		this.messages = messages;
-	}*/
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
