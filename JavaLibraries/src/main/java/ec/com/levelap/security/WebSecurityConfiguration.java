@@ -36,10 +36,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Value("${levelap.securityEnabled}")
 	private Boolean securityEnabled;
 	
-	@Value("${levelap.withoutSecurity}")
-	private String[] withoutSecurity;
-	
-	
 	@Autowired
 	private AuthenticationService authenticationService;
 	
