@@ -18,7 +18,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
@@ -53,15 +52,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
 		if(securityEnabled) {
-			ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry authorized = http.authorizeRequests();
-			for(String data : withoutSecurity) {
-				authorized
-					.antMatchers(HttpMethod.GET, data).permitAll()
-					.antMatchers(HttpMethod.POST, data).permitAll();
-			}
-			http = authorized.anyRequest().authenticated().and();
 			http
-				.csrf()
+				.authorizeRequests()
+					.antMatchers(HttpMethod.GET, "/open/**").permitAll()
+					.antMatchers(HttpMethod.POST, "/open/**").permitAll()
+				.anyRequest().authenticated()
+				.and().csrf()
 				.csrfTokenRepository(csrfTokenRepository())
 				.and()
 				.addFilterBefore(usernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
