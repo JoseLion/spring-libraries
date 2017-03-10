@@ -101,9 +101,9 @@ public class BaseEntity {
 		LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
 		this.setUpdateDate(new Date());
 		try {
-			this.setCreationUser(levelap.getConfig().getCurrentUser());
+			this.setUpdateUser(levelap.getConfig().getCurrentUser());
 		} catch (Exception ex) {
-			this.setCreationUser(-1L);
+			this.setUpdateUser(-1L);
 		}
 	}
 
