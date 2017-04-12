@@ -18,6 +18,9 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 	@Autowired
 	private LevelapSecurity levelapSecurity;
 	
+	@Autowired
+	private AuthenticationService authService;
+	
 	private AuthenticationFilter authenticationFilter = new AuthenticationFilter();
 	
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws AuthenticationException, IOException, ServletException {
@@ -33,7 +36,7 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 			}
 			
 			if (!username.isEmpty() && Boolean.parseBoolean(decoded[2])) {
-				boolean wasResetted = levelapSecurity.getConfig().resetUserPassword(username);
+				boolean wasResetted = levelapSecurity.getConfig().resetUserPassword(username, authService.getExtra());
 				
 				if (wasResetted) {
 					response.setStatus(HttpServletResponse.SC_OK);
@@ -47,13 +50,13 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 			}
 		} else {
 			if (!username.isEmpty() && exception.getClass().isAssignableFrom(BadCredentialsException.class)) {
-				levelapSecurity.getConfig().setLastFailedAttempt(username, new Date());
+				levelapSecurity.getConfig().setLastFailedAttempt(username, new Date(), authService.getExtra());
 				
-				if (levelapSecurity.getConfig().getNumberOfAttempts(username) != null) {
-					levelapSecurity.getConfig().setNumberOfAttempts(username, levelapSecurity.getConfig().getNumberOfAttempts(username) + 1);
+				if (levelapSecurity.getConfig().getNumberOfAttempts(username, authService.getExtra()) != null) {
+					levelapSecurity.getConfig().setNumberOfAttempts(username, levelapSecurity.getConfig().getNumberOfAttempts(username, authService.getExtra()) + 1, authService.getExtra());
 					
-					if (levelapSecurity.getConfig().getNumberOfAttempts(username) >= levelapSecurity.getConfig().getMaxAttempts()) {
-						levelapSecurity.getConfig().setLockDate(username, new Date());
+					if (levelapSecurity.getConfig().getNumberOfAttempts(username, authService.getExtra()) >= levelapSecurity.getConfig().getMaxAttempts()) {
+						levelapSecurity.getConfig().setLockDate(username, new Date(), authService.getExtra());
 					}
 				}
 			}
