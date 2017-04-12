@@ -14,17 +14,20 @@ public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticatio
 	@Autowired
 	private LevelapSecurity levelapSecurity;
 	
+	@Autowired
+	private AuthenticationService authService;
+	
 	private AuthenticationFilter authenticationFilter = new AuthenticationFilter();
 	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 		String username = authenticationFilter.getAuthHeaderDecoded(request)[0];
 		
-		if (levelapSecurity.getConfig().getNumberOfAttempts(username) != null) {
-			if (!username.isEmpty() && levelapSecurity.getConfig().getNumberOfAttempts(username) != 0) {
-				levelapSecurity.getConfig().setNumberOfAttempts(username, 0);
-				levelapSecurity.getConfig().setLockDate(username, null);
-				levelapSecurity.getConfig().setLastFailedAttempt(username, null);
+		if (levelapSecurity.getConfig().getNumberOfAttempts(username, authService.getExtra()) != null) {
+			if (!username.isEmpty() && levelapSecurity.getConfig().getNumberOfAttempts(username, authService.getExtra()) != 0) {
+				levelapSecurity.getConfig().setNumberOfAttempts(username, 0, authService.getExtra());
+				levelapSecurity.getConfig().setLockDate(username, null, authService.getExtra());
+				levelapSecurity.getConfig().setLastFailedAttempt(username, null, authService.getExtra());
 			}
 		}
 		response.setContentType(SecurityConst.TEXT_UTF8_HEADER);

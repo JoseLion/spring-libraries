@@ -13,6 +13,8 @@ public interface SecurityConst {
 	
 	public static final String AUTHORIZATION_HEADER = "authorization";
 	
+	public static final String EXTRA_HEADER = "extra";
+	
 	public static final String TOKEN_HEADER = "X-XSRF-TOKEN";
 	
 	public static final String COOKIES_TOKEN_NAME = "XSRF-TOKEN";
@@ -49,7 +51,7 @@ public interface SecurityConst {
 	
 	public static final String VALUE_ALLOW_METHODS = "POST, GET, OPTIONS, DELETE";
 	
-	public static final String VALUE_ALLOW_HEADERS = "Origin, Authorization, X-Requested-With, Content-Type, Accept, X-XSRF-TOKEN, Content-Encoding";
+	public static final String VALUE_ALLOW_HEADERS = "Origin, Authorization, Extra, X-Requested-With, Content-Type, Accept, X-XSRF-TOKEN, Content-Encoding";
 	
 	public static final String MAIL_FAILURE_MESSAGE = "No se pudo enviar el correo con la clave temporal, por favor intente nuevamente";
 	
