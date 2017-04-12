@@ -3,3 +3,6 @@
 Servers/
 RemoteSystemsTempFiles/
 JavaLibraries/bin
+/.gradle/
+.project
+.settings
