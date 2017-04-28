@@ -1,6 +1,5 @@
-package ec.com.levelap.archive;
+package ec.com.levelap.commons.archive;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,31 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
-import ec.com.levelap.base.service.BaseService;
-import ec.com.levelap.base.service.DocumentService;
+import ec.com.levelap.commons.service.DocumentService;
 
 @Service
-public class ArchiveService extends BaseService<Archive> {
-
-	public ArchiveService() {
-		super(Archive.class);
-	}
-
+public class ArchiveService {
 	@Autowired
 	private ArchiveRepository archiveRepository;
 
 	@Autowired
 	private DocumentService documentService;
 	
-	public void downloadFile(String path, HttpServletResponse response) throws ServletException, IOException {
-		String[] split = null;
-		if (File.separator.equals("\\")) {
-			split = path.split("\\\\");
-		} else {
-			split = path.split(File.separator);
-		}
-		InputStream inputStream = this.documentService.getFile(path);
-		response.setHeader("Content-Disposition", String.format("inline; filename=\"" + split[split.length - 1] + "\""));
+	public void downloadFile(String name, String module, HttpServletResponse response) throws ServletException, IOException {
+		InputStream inputStream = this.documentService.getFile(name, module);
+		response.setHeader("Content-Disposition", String.format("inline; filename=\"" + name + "\""));
 		response.setContentType("application/octet-stream");
 		FileCopyUtils.copy(inputStream, response.getOutputStream());
 		response.flushBuffer();

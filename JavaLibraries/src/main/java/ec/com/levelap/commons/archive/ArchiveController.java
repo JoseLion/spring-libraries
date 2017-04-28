@@ -1,6 +1,7 @@
-package ec.com.levelap.archive;
+package ec.com.levelap.commons.archive;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +20,7 @@ public class ArchiveController {
 	private ArchiveService archiveService;
 	
 	@RequestMapping(value = "/downloadFile", method = RequestMethod.POST)
-	public void downloadFileFromPath(@RequestBody Object path, HttpServletResponse response) throws ServletException, IOException {
-		archiveService.downloadFile(path.toString(), response);
+	public void downloadFileFromPath(@RequestBody HashMap<String, String> obj, HttpServletResponse response) throws ServletException, IOException {
+		archiveService.downloadFile(obj.get("name"), obj.get("module"), response);
 	}
 }

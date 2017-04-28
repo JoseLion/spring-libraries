@@ -1,4 +1,4 @@
-package ec.com.levelap.archive;
+package ec.com.levelap.commons.archive;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
