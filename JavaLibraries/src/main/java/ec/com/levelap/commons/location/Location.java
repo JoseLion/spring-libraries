@@ -1,4 +1,4 @@
-package ec.com.levelap.commons.catalog;
+package ec.com.levelap.commons.location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +19,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ec.com.levelap.base.entity.BaseEntity;
 
 @Entity
-@Table(schema="commons", name="catalog", uniqueConstraints=@UniqueConstraint(columnNames="code", name="code_uk"))
+@Table(schema="commons", name="location", uniqueConstraints=@UniqueConstraint(columnNames="code", name="code_uk"))
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Catalog extends BaseEntity {
+public class Location extends BaseEntity {
 	@Column(columnDefinition="VARCHAR", nullable=false)
 	private String name;
 	
@@ -32,20 +32,20 @@ public class Catalog extends BaseEntity {
 	private String other;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="parent", foreignKey=@ForeignKey(name="parent_catalog_fk"))
-	private Catalog parent;
+	@JoinColumn(name="parent", foreignKey=@ForeignKey(name="parent_location_fk"))
+	private Location parent;
 	
 	@OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
-	private List<Catalog> children = new ArrayList<>();
+	private List<Location> children = new ArrayList<>();
 	
 	@Transient
 	private Integer level = 0;
 
-	public Catalog() {
+	public Location() {
 		super();
 	}
 
-	public Catalog(String name, String code, String other) {
+	public Location(String name, String code, String other) {
 		super();
 		this.name = name;
 		this.code = code;
@@ -76,7 +76,7 @@ public class Catalog extends BaseEntity {
 		this.other = other;
 	}
 
-	public Catalog getParent() {
+	public Location getParent() {
 		if (this.parent != null) {
 			this.parent.setChildren(new ArrayList<>());
 		}
@@ -84,21 +84,21 @@ public class Catalog extends BaseEntity {
 		return this.parent;
 	}
 
-	public void setParent(Catalog parent) {
+	public void setParent(Location parent) {
 		this.parent = parent;
 	}
 
-	public List<Catalog> getChildren() {
+	public List<Location> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Catalog> children) {
+	public void setChildren(List<Location> children) {
 		this.children = children;
 	}
 
 	public Integer getLevel() {
 		this.level = 0;
-		Catalog currentParent = this.parent;
+		Location currentParent = this.parent;
 		
 		while (currentParent != null) {
 			this.level++;

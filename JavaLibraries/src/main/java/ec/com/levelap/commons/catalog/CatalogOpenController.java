@@ -21,25 +21,25 @@ public class CatalogOpenController {
 	
 	@RequestMapping(value="findAll", method=RequestMethod.GET)
 	public ResponseEntity<List<Catalog>> findAll() throws ServletException {
-		List<Catalog> catalogs = catalogService.getCatalogRepository().findAllByOrderByName();
+		List<Catalog> catalogs = catalogService.getCatalogRepo().findAllByOrderByName();
 		return new ResponseEntity<List<Catalog>>(catalogs, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="findOne/{id}", method=RequestMethod.GET)
 	public ResponseEntity<Catalog> findOne(@PathVariable Long id) throws ServletException {
-		Catalog catalog = catalogService.getCatalogRepository().findOne(id);
+		Catalog catalog = catalogService.getCatalogRepo().findOne(id);
 		return new ResponseEntity<Catalog>(catalog, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="findOne/{code}", method=RequestMethod.GET)
 	public ResponseEntity<Catalog> findOne(@PathVariable String code) throws ServletException {
-		Catalog catalog = catalogService.getCatalogRepository().findByCode(code);
+		Catalog catalog = catalogService.getCatalogRepo().findByCode(code);
 		return new ResponseEntity<Catalog>(catalog, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="findChildrenOf/{code}", method=RequestMethod.GET)
 	public ResponseEntity<List<Catalog>> findChildrenOf(@PathVariable String code) throws ServletException {
-		List<Catalog> children = catalogService.getCatalogRepository().findByParentCode(code);
+		List<Catalog> children = catalogService.getCatalogRepo().findByParentCode(code);
 		return new ResponseEntity<List<Catalog>>(children, HttpStatus.OK);
 	}
 }

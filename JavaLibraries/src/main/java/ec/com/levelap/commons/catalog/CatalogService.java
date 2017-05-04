@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CatalogService {
 	@Autowired
-	private CatalogRepository catalogRepository;
+	private CatalogRepo catalogRepo;
 
-	public CatalogRepository getCatalogRepository() {
-		return catalogRepository;
+	public CatalogRepo getCatalogRepo() {
+		return catalogRepo;
 	}
 }
