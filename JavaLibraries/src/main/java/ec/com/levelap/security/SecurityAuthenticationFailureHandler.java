@@ -74,6 +74,8 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 			}
 			
 			response.flushBuffer();
+			
+			levelapSecurity.getConfig().handleError();
 		}
 	}
 }
