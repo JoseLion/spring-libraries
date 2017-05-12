@@ -26,7 +26,7 @@ public abstract class BaseKushkiSubscription {
 	protected Date creationDate = new Date();
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "creation_date")
+	@Column(name = "update_date")
 	protected Date updateDate;
 
 	@Column(name = "first_name", nullable = false, columnDefinition = "VARCHAR")
