@@ -1,44 +1,33 @@
 /**
  * @Copyright:	Levelap 2017
- * @Class:		KushkiException.java
+ * @Class:		KushkiService.java
  * @Created:	23-03-2016
- * @Updated:	
+ * @Updated:	12-05-2016
  */
 package ec.com.levelap.kushki.service;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ec.com.levelap.kushki.KushkiException;
 import ec.com.levelap.kushki.object.KushkiAmount;
 import ec.com.levelap.kushki.object.KushkiContact;
-import ec.com.levelap.kushki.object.KushkiSubscriptionRequest;
+import ec.com.levelap.kushki.object.KushkiServicesEnum;
 
 /**
  * Kushki integration with Spring Framework exposed as {@link Service}. The
- * integration need a configuration like at application.yml:<br/>
+ * integration need a configuration like:<br/>
+ * * In application.yml:<br/>
  * <br/>
- * 
  * kushki-configuration:<br/>
  * &nbsp;&nbsp;show-log: true OR false<br/>
  * &nbsp;&nbsp;private-merchant-id: PRIVATE_MERCHANT_ID<br/>
@@ -64,249 +53,298 @@ import ec.com.levelap.kushki.object.KushkiSubscriptionRequest;
  * @author Luis García Castro.
  */
 @Service
-public class KushkiService {
-
-	@Autowired
-	private RestTemplate restTemplate;
-
-	@Value("${kushki-configuration.show-log}")
-	private Boolean showLog;
-
-	@Value("${kushki-configuration.private-merchant-id}")
-	private String privateMerchantId;
-
-	@Value("${kushki-configuration.end-point.path}")
-	private String endPoint;
-
-	private static final String SUBSCRIPTION_CREATE = "/subscriptions";
-
-	private static final String SUBSCRIPTION_PATCH = "/subscriptions/{subscriptionId}";
-
-	private static final String SUBSCRIPTION_CHARGE = "/subscriptions/{subscriptionId}/charges";
-
-	private static final String SUBSCRIPTION_PUT_CARD = "/subscriptions/{subscriptionId}/card";
+public class KushkiService extends KushkiServiceIntegration {
 
 	/**
-	 * Checks some configuration at application.yml and
-	 * {@link SpringBootApplication}
-	 * 
-	 * @throws ServletException
-	 *             Internal server error.
-	 */
-	private void checkConfiguration() throws ServletException {
-		if (privateMerchantId == null || privateMerchantId.equals("")) {
-			throw new ServletException("Make sure you set up your Kushki Private Merchant Id into your application.properties or application.yml");
-		}
-		if (restTemplate == null) {
-			throw new ServletException("Make sure you set up your RestTemplate bean");
-		}
-		if (endPoint == null) {
-			throw new ServletException("Make sure you set up your the end-point.path on your application yml");
-		}
-	}
-
-	/**
-	 * Allows to create a subscription id with the API RESTful by Kushki.
+	 * Make a charge with a <b>token</b> provided by Kushki which represents the
+	 * customer's credit card. The <b>amount object</b> contains the detailed
+	 * amount to be charged. If the <b>months</b> field is provided and is
+	 * between 2 and 48, a deferred charge will be performed.
 	 * 
 	 * @param token
-	 *            Kushki token generated at frontend.
-	 * @param firstName
-	 *            Subscription owner's first name.
-	 * @param lastName
-	 *            Subscription owner's last name.
-	 * @param email
-	 *            Subscription owner's email.
-	 * @return the subscription number generated.
-	 * @throws ServletException
-	 *             Internal server error.
-	 * @throws KushkiException
-	 */
-	@Transactional
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String createSubscriptionId(String token, String firstName, String lastName, String email, String planName, String periodicity, String language, Map<String, String> metadata) throws ServletException, KushkiException {
-		try {
-			this.checkConfiguration();
-			if (SUBSCRIPTION_CREATE == null) {
-				throw new ServletException("Make sure you set up your the subscription.create on your application yml");
-			}
-
-			KushkiSubscriptionRequest kushkiRequest = new KushkiSubscriptionRequest(planName, periodicity, language, metadata);
-			kushkiRequest.setToken(token);
-			kushkiRequest.setContactDetails(new KushkiContact(firstName, lastName, email));
-			kushkiRequest.setAmount(new KushkiAmount(0D));
-
-			HttpEntity<?> httpRequest = new HttpEntity<>(kushkiRequest, this.createHeaderRest());
-			ResponseEntity<HashMap> httpResponse = this.restTemplate.postForEntity(endPoint.concat(SUBSCRIPTION_CREATE), httpRequest, HashMap.class);
-			if (!httpResponse.getStatusCode().equals(HttpStatus.CREATED)) {
-				throw this.getException(httpResponse.getBody());
-			}
-			return (String) httpResponse.getBody().get("subscriptionId");
-		} catch (HttpClientErrorException ex) {
-			try {
-				Map<String, Object> kushkiError = new HashMap<>();
-				ObjectMapper mapper = new ObjectMapper();
-				kushkiError = mapper.readValue(ex.getResponseBodyAsString(), new TypeReference<Map<String, Object>>() {
-				});
-				throw getException(kushkiError);
-			} catch (IOException iox) {
-				if (showLog) {
-					iox.printStackTrace();
-				}
-				throw new ServletException("Kushki Integration Error");
-			}
-		} catch (Exception ex) {
-			if (showLog) {
-				ex.printStackTrace();
-			}
-			throw new ServletException("Kushki Integration Error");
-		}
-	}
-
-	/**
-	 * Allows to update an existing subscription with the API RESTful by Kushki.
-	 * 
-	 * @param token
-	 *            Kushki token generated at frontend.
-	 * @param subscriptionId
-	 *            Subscription id to update.
-	 * @return Subscription id to update.
-	 * @throws ServletException
-	 *             Internal server error.
-	 * @throws KushkiException
-	 */
-	@Transactional
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void updateSuscriptionCard(final String token, final String subscriptionId) throws ServletException, KushkiException {
-		try {
-			this.checkConfiguration();
-			if (SUBSCRIPTION_PUT_CARD == null) {
-				throw new ServletException("Make sure you set up your the subscription.put-card on your application yml");
-			}
-
-			Map<String, Object> kushkiRequest = new HashMap<>();
-			kushkiRequest.put("token", token);
-
-			Map<String, String> params = new HashMap<String, String>();
-			params.put("subscriptionId", subscriptionId);
-
-			HttpEntity<?> httpRequest = new HttpEntity<>(kushkiRequest, this.createHeaderRest());
-			ResponseEntity<HashMap> httpResponse = this.restTemplate.exchange(endPoint.concat(SUBSCRIPTION_PUT_CARD), HttpMethod.PUT, httpRequest, HashMap.class, params);
-			if (!httpResponse.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-				throw this.getException(httpResponse.getBody());
-			}
-		} catch (HttpClientErrorException ex) {
-			try {
-				Map<String, Object> kushkiError = new HashMap<>();
-				ObjectMapper mapper = new ObjectMapper();
-				kushkiError = mapper.readValue(ex.getResponseBodyAsString(), new TypeReference<Map<String, Object>>() {
-				});
-				throw getException(kushkiError);
-			} catch (IOException iox) {
-				if (showLog) {
-					iox.printStackTrace();
-				}
-				throw new ServletException("Kushki Integration Error");
-			}
-		} catch (Exception ex) {
-			if (showLog) {
-				ex.printStackTrace();
-			}
-			throw new ServletException("Kushki Integration Error");
-		}
-	}
-
-	/**
-	 * Allows to charge an amount to an existing subscription with the API
-	 * RESTful by Kushki.
-	 * 
-	 * @param subscriptionId
-	 *            Subscription id to charge an amount.
+	 *            Kushki token generated at frontend ({@link String}).
 	 * @param amount
+	 *            {@link KushkiAmount} object.
+	 * @param optionals
+	 *            {@link Map} of optionals values:<br/>
+	 *            * months: {@link Integer} number with max value of 48.<br/>
+	 *            * metadata: {@link Map} of {@link String}.
 	 * @return the transaction ticket number generated.
 	 * @throws ServletException
-	 *             Internal server error.
 	 * @throws KushkiException
 	 */
 	@Transactional
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String chargeAmountToSubscription(final String subscriptionId, final Double amount) throws ServletException, KushkiException {
-		try {
-			this.checkConfiguration();
-			if (SUBSCRIPTION_PATCH == null) {
-				throw new ServletException("Make sure you set up your the subscription.patch on your application yml");
-			}
-			if (SUBSCRIPTION_CHARGE == null) {
-				throw new ServletException("Make sure you set up your the subscription.charge on your application yml");
-			}
-
-			Map<String, Object> kushkiRequest = new HashMap<>();
-			kushkiRequest.put("amount", new KushkiAmount(amount));
-
-			Map<String, String> params = new HashMap<String, String>();
-			params.put("subscriptionId", subscriptionId);
-
-			HttpEntity<?> httpRequestPatch = new HttpEntity<>(kushkiRequest, this.createHeaderRest());
-			ResponseEntity<HashMap> httpResponsePatch = this.restTemplate.exchange(endPoint.concat(SUBSCRIPTION_PATCH), HttpMethod.PATCH, httpRequestPatch, HashMap.class, params);
-			if (!httpResponsePatch.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-				throw getException(httpResponsePatch.getBody());
-			}
-
-			HttpEntity<?> httpRequestCharge = new HttpEntity<>(null, this.createHeaderRest());
-			ResponseEntity<HashMap> httpResponseCharge = this.restTemplate.postForEntity(endPoint.concat(SUBSCRIPTION_CHARGE), httpRequestCharge, HashMap.class, params);
-			if (!httpResponseCharge.getStatusCode().equals(HttpStatus.CREATED)) {
-				throw getException(httpResponseCharge.getBody());
-			}
-			return (String) httpResponseCharge.getBody().get("ticketNumber");
-		} catch (HttpClientErrorException ex) {
-			try {
-				Map<String, Object> kushkiError = new HashMap<>();
-				ObjectMapper mapper = new ObjectMapper();
-				kushkiError = mapper.readValue(ex.getResponseBodyAsString(), new TypeReference<Map<String, Object>>() {
-				});
-				throw getException(kushkiError);
-			} catch (IOException iox) {
-				if (showLog) {
-					iox.printStackTrace();
-				}
-				throw new ServletException("Kushki Integration Error");
-			}
-		} catch (Exception ex) {
-			if (showLog) {
-				ex.printStackTrace();
-			}
-			throw new ServletException("Kushki Integration Error");
+	@SuppressWarnings("unchecked")
+	public String transactionCharge(final String token, final KushkiAmount amount, final Map<String, Object>... optionals) throws ServletException, KushkiException {
+		Map<String, Object> kushkiRequest = new HashMap<>();
+		kushkiRequest.put("token", token);
+		kushkiRequest.put("amount", amount);
+		if (optionals[0].get("months") == null) {
+			kushkiRequest.put("months", optionals[0].get("months"));
 		}
+		if (optionals[0].get("metadata") == null) {
+			kushkiRequest.put("metadata", optionals[0].get("metadata"));
+		}
+		return (String) super.doOperation(KushkiServicesEnum.TRANSACTION_CHARGE, kushkiRequest);
 	}
 
 	/**
-	 * Allows to set the Kushki Exception object to propagate the exception with
-	 * the integration.
+	 * Void a transaction identified by its <b>ticketNumber</b>. The
+	 * <b>ticketNumber</b> is provided when a charge or a deferred charge is
+	 * successful. The <b>amount object</b> contains the detailed amount of the
+	 * transaction to be voided.
 	 * 
-	 * @param response
-	 *            rest client response.
-	 * @return KushkiException
+	 * @param ticketNumber
+	 *            Transaction ticket number generated on charge event
+	 *            ({@link String}).
+	 * @param optionals
+	 *            {@link Map} of optionals values:<br/>
+	 *            * amount: {@link KushkiAmount} object.
+	 * @return the transaction ticket number generated.
 	 * @throws ServletException
+	 * @throws KushkiException
 	 */
-	private KushkiException getException(Map<String, Object> response) throws ServletException {
-		if (response.containsKey("code") && response.containsKey("message")) {
-			return new KushkiException((String) response.get("code"), (String) response.get("message"));
-		} else {
-			throw new ServletException("Kushki Integration Error");
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public String voidTransactionCharge(final String ticketNumber, final Map<String, Object>... optionals) throws ServletException, KushkiException {
+		Map<String, Object> kushkiRequest = new HashMap<>();
+		if (optionals[0].get("amount") == null) {
+			kushkiRequest.put("amount", optionals[0].get("amount"));
 		}
+		Map<String, Object> params = new HashMap<>();
+		params.put("ticketNumber", ticketNumber);
+		return (String) super.doOperation(KushkiServicesEnum.TRANSACTION_VOID, kushkiRequest, params);
 	}
 
 	/**
-	 * Perform the header configuration to be used by the {@link RestTemplate}
-	 * client.
+	 * Create a subscription with a <b>token</b> provided by Kushki which
+	 * represents the customer's credit card. The <b>amount object</b> contains
+	 * the detailed amount to be charged with the given <b>periodicity</b>.
 	 * 
-	 * @return the header configured with the kushki private merchant id.
+	 * @param token
+	 *            Kushki token generated at frontend ({@link String}).
+	 * @param planName
+	 *            Single name for the plan ({@link String}).
+	 * @param periodicity
+	 *            The periodicity's charge type ({@link String}):<br/>
+	 *            * daily<br/>
+	 *            * weekly</br>
+	 *            * biweekly</br>
+	 *            * monthly</br>
+	 *            * quarterly</br>
+	 *            * halfYearly</br>
+	 *            * yearly</br>
+	 *            * custom
+	 * @param contactDetails
+	 *            {@link KushkiContact} object.
+	 * @param amount
+	 *            {@link KushkiAmount} object.
+	 * @param optionals
+	 *            {@link Map} of optionals values:<br/>
+	 *            * language: {@link String} acronym of language ("es", "fr",
+	 *            "en").<br/>
+	 *            * metadata: {@link Map} of {@link String}.
+	 * @return the subscription number generated.
+	 * @throws ServletException
+	 * @throws KushkiException
 	 */
-	private HttpHeaders createHeaderRest() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Private-Merchant-Id", this.privateMerchantId);
-		return headers;
+	@SuppressWarnings("unchecked")
+	@Transactional
+	public String subscriptionCreate(final String token, final String planName, final String periodicity, final KushkiContact contactDetails, final KushkiAmount amount, final Map<String, Object>... optionals) throws ServletException, KushkiException {
+		Map<String, Object> kushkiRequest = new HashMap<>();
+		kushkiRequest.put("token", token);
+		kushkiRequest.put("planName", planName);
+		kushkiRequest.put("periodicity", periodicity);
+		kushkiRequest.put("contactDetails", contactDetails);
+		kushkiRequest.put("amount", amount);
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date today = Calendar.getInstance().getTime();
+		kushkiRequest.put("startDate", dateFormat.format(today));
+		if (optionals[0].get("language") == null) {
+			kushkiRequest.put("language", optionals[0].get("language"));
+		}
+		if (optionals[0].get("metadata") == null) {
+			kushkiRequest.put("metadata", optionals[0].get("metadata"));
+		}
+		return (String) super.doOperation(KushkiServicesEnum.SUBSCRIPTION_CREATE, kushkiRequest);
+	}
+
+	/**
+	 * Cancel a subscription identified by its <b>subscriptionId</b>.
+	 * 
+	 * @param subscriptionId
+	 *            Subscription id to be cancel ({@link String}).
+	 * @param optionals
+	 *            {@link Map} of optionals values:<br/>
+	 *            * language: {@link String} acronym of language ("es", "fr",
+	 *            "en").<br/>
+	 * @return Final transaction status (TRUE for successful response).
+	 * @throws ServletException
+	 * @throws KushkiException
+	 */
+	@SuppressWarnings("unchecked")
+	@Transactional
+	public Boolean subscriptionCancel(final String subscriptionId, final Map<String, Object>... optionals) throws ServletException, KushkiException {
+		Map<String, Object> kushkiRequest = new HashMap<>();
+		if (optionals[0].get("language") == null) {
+			kushkiRequest.put("language", optionals[0].get("language"));
+		}
+		Map<String, Object> params = new HashMap<>();
+		params.put("subscriptionId", subscriptionId);
+		return (Boolean) super.doOperation(KushkiServicesEnum.SUBSCRIPTION_CANCEL, kushkiRequest, params);
+	}
+
+	/**
+	 * Update a subscription identified by its <b>subscriptionId</b>. All the
+	 * fields are optional, they must be sent if they are meant to be changed.
+	 * 
+	 * @param subscriptionId
+	 *            Subscription id to be updated ({@link String}).
+	 * @param optionals
+	 *            {@link Map} of optionals values:<br/>
+	 *            * planName: Single name for the plan ({@link String}).<br/>
+	 *            * periodicity: The periodicity's charge type
+	 *            ({@link String}):<br/>
+	 *            - daily<br/>
+	 *            - weekly</br>
+	 *            - biweekly</br>
+	 *            - monthly</br>
+	 *            - quarterly</br>
+	 *            - halfYearly</br>
+	 *            - yearly</br>
+	 *            - custom</br>
+	 *            * contactDetails: {@link KushkiContact} object.</br>
+	 *            * amount: {@link KushkiAmount} object.</br>
+	 *            * language: {@link String} acronym of language ("es", "fr",
+	 *            "en").<br/>
+	 *            * metadata: {@link Map} of {@link String}.
+	 * @return Final transaction status (TRUE for successful response).
+	 * @throws ServletException
+	 * @throws KushkiException
+	 */
+	@Transactional
+	@SuppressWarnings({ "unchecked" })
+	public Boolean subscriptionUpdate(final String subscriptionId, final Map<String, Object>... optionals) throws ServletException, KushkiException {
+		Map<String, Object> kushkiRequest = new HashMap<>();
+		if (optionals[0].get("planName") != null) {
+			kushkiRequest.put("planName", optionals[0].get("planName"));
+		}
+		if (optionals[0].get("periodicity") != null) {
+			kushkiRequest.put("periodicity", optionals[0].get("periodicity"));
+		}
+		if (optionals[0].get("contactDetails") != null) {
+			kushkiRequest.put("contactDetails", optionals[0].get("contactDetails"));
+		}
+		if (optionals[0].get("amount") != null) {
+			kushkiRequest.put("amount", optionals[0].get("amount"));
+		}
+		if (optionals[0].get("startDate") != null) {
+			kushkiRequest.put("startDate", optionals[0].get("startDate"));
+		}
+		if (optionals[0].get("language") != null) {
+			kushkiRequest.put("language", optionals[0].get("language"));
+		}
+		if (optionals[0].get("metadata") != null) {
+			kushkiRequest.put("metadata", optionals[0].get("metadata"));
+		}
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("subscriptionId", subscriptionId);
+		return (Boolean) super.doOperation(KushkiServicesEnum.SUBSCRIPTION_UPDATE, kushkiRequest, params);
+	}
+
+	/**
+	 * Make a charge on an existing subscription identified by its
+	 * <b>subscriptionId</b>. The <b>cvv</b> is optional but if parameterized it
+	 * will be validated. The <b>amount</b> is optional but if it is present on
+	 * the request is used instead the amount configured on the Subscription.
+	 * 
+	 * @param subscriptionId
+	 *            Subscription id to be charged ({@link String}).
+	 * @param optionals
+	 *            {@link Map} of optionals values:<br/>
+	 *            * amount: {@link KushkiAmount} object.</br>
+	 *            * cvv: {@link String} card secure code.</br>
+	 *            * language: {@link String} acronym of language ("es", "fr",
+	 *            "en").<br/>
+	 *            * metadata: {@link Map} of {@link String}.
+	 * @return the transaction ticket number generated.
+	 * @throws ServletException
+	 * @throws KushkiException
+	 */
+	@Transactional
+	@SuppressWarnings({ "unchecked" })
+	public String subscriptionCharge(final String subscriptionId, final Map<String, Object>... optionals) throws ServletException, KushkiException {
+		Map<String, Object> kushkiRequest = new HashMap<>();
+		if (optionals[0].get("amount") != null) {
+			kushkiRequest.put("amount", optionals[0].get("amount"));
+		}
+		if (optionals[0].get("cvv") != null) {
+			kushkiRequest.put("cvv", optionals[0].get("cvv"));
+		}
+		if (optionals[0].get("language") != null) {
+			kushkiRequest.put("language", optionals[0].get("language"));
+		}
+		if (optionals[0].get("metadata") != null) {
+			kushkiRequest.put("metadata", optionals[0].get("metadata"));
+		}
+		Map<String, Object> params = new HashMap<>();
+		params.put("subscriptionId", subscriptionId);
+		return (String) super.doOperation(KushkiServicesEnum.SUBSCRIPTION_CHARGE, kushkiRequest, params);
+	}
+
+	/**
+	 * Add a temporary charge or discount to a Subscription identified by its
+	 * <b>subscriptionId</b>.
+	 * 
+	 * @param subscriptionId
+	 *            Subscription id to make an adjustment ({@link String}).
+	 * @param type
+	 *            Additional operation type ({@link String}):<br/>
+	 *            * charge<br/>
+	 *            * discount
+	 * @param amount
+	 *            {@link KushkiAmount} object.
+	 * @param periods
+	 *            {@link Integer} number with min value of 1.
+	 * @return Final transaction status (TRUE for successful response).
+	 * @throws ServletException
+	 * @throws KushkiException
+	 */
+	@Transactional
+	@SuppressWarnings({ "unchecked" })
+	public Boolean suscriptionAdjustment(final String subscriptionId, final String type, final KushkiAmount amount, final Integer periods) throws ServletException, KushkiException {
+		Map<String, Object> kushkiRequest = new HashMap<>();
+		kushkiRequest.put("type", type);
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date today = Calendar.getInstance().getTime();
+		kushkiRequest.put("date", dateFormat.format(today));
+		kushkiRequest.put("amount", amount);
+		kushkiRequest.put("periods", periods);
+		Map<String, Object> params = new HashMap<>();
+		params.put("subscriptionId", subscriptionId);
+		return (Boolean) super.doOperation(KushkiServicesEnum.SUBSCRIPTION_ADJUSTMENT, kushkiRequest, params);
+	}
+
+	/**
+	 * Update a subscription's card information, identified by its
+	 * <b>subscriptionId</b>.
+	 * 
+	 * @param subscriptionId
+	 *            Subscription id to update the card ({@link String}).
+	 * @param token
+	 *            Kushki token generated at frontend ({@link String}).
+	 * @return Final transaction status (TRUE for successful response).
+	 * @throws ServletException
+	 * @throws KushkiException
+	 */
+	@Transactional
+	@SuppressWarnings({ "unchecked" })
+	public Boolean suscriptionUpdateCard(final String subscriptionId, final String token) throws ServletException, KushkiException {
+		Map<String, Object> kushkiRequest = new HashMap<>();
+		kushkiRequest.put("token", token);
+		Map<String, Object> params = new HashMap<>();
+		params.put("subscriptionId", subscriptionId);
+		return (Boolean) super.doOperation(KushkiServicesEnum.SUBSCRIPTION_UPDATE_CARD, kushkiRequest, params);
 	}
 
 }

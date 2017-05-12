@@ -1,8 +1,8 @@
 /**
  * @Copyright:	Levelap 2017
  * @Class:		KushkiContact.java
- * @Created:	23-03-2016
- * @Updated:	
+ * @Created:	23-03-2017
+ * @Updated:	12-05-2017
  */
 package ec.com.levelap.kushki.object;
 
