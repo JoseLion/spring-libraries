@@ -60,6 +60,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 					.antMatchers(HttpMethod.POST, "/logout/**").permitAll()
 				.anyRequest().authenticated()
 				.and().csrf()
+				.ignoringAntMatchers("/open/**", "/login/**", "/logout/**")
 				.csrfTokenRepository(csrfTokenRepository())
 				.and()
 				.logout()

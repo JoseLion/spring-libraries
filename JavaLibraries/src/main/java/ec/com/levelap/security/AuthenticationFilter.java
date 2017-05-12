@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -16,6 +17,9 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+	@Autowired
+	private AuthenticationService authenticationService;
+	
 	protected AuthenticationFilter() {
 		super(new AntPathRequestMatcher(SecurityConst.LOGIN_BASE_URL + SecurityConst.LOGIN_USER_URL, SecurityConst.ANT_REQUEST_MATCHER_METHOD));
 	}
@@ -39,6 +43,10 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
 	}
 	
 	public String[] getAuthHeaderDecoded(HttpServletRequest request) throws UnsupportedEncodingException {
+		if (authenticationService != null) {
+			authenticationService.setExtra(request.getHeader(SecurityConst.EXTRA_HEADER));
+		}
+		
 		String authorizationHeader = request.getHeader(SecurityConst.AUTHORIZATION_HEADER);
 		
 		if (authorizationHeader != null) {

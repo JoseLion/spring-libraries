@@ -1,4 +1,4 @@
-package ec.com.levelap.base.service;
+package ec.com.levelap.commons.service;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 
@@ -20,7 +19,6 @@ import ec.com.levelap.base.entity.FileData;
 
 @Service
 public class DocumentService {
-
 	@Autowired
 	private Environment environment;
 
@@ -31,59 +29,124 @@ public class DocumentService {
 		if (environment.getProperty(fileEnvironment) == null) {
 			throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO ".concat(fileEnvironment).concat(" EN SU EQUIPO"));
 		}
+		
 		StringBuilder path = new StringBuilder(environment.getProperty(fileEnvironment));
 		path.append(File.separator);
-		path.append(module);
+		
+		if (module != null && !module.isEmpty()) {
+			path.append(module);
+		}
+		
 		File directory = new File(path.toString());
+		
 		if (!directory.exists()) {
 			directory.mkdirs();
 		}
-		path.append(File.separator);
-		path.append(file.getOriginalFilename());
-		FileData fileData = sameFileName(path.toString(), 0);
-		fileData.setPath(fileData.getPath());
-		File serverFile = new File(fileData.getPath());
+		
+		if (module != null && !module.isEmpty()) {
+			path.append(File.separator);
+		}
+		
+		String fileName = renameIfDuplicate(path.toString(), file.getOriginalFilename(), 0);
+		path.append(fileName);
+		
+		File serverFile = new File(path.toString());
 		byte[] bytes = file.getBytes();
 		BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile, true));
+		
 		stream.write(bytes);
 		stream.close();
+		
+		FileData fileData = new FileData();
+		fileData.setName(fileName);
+		fileData.setPath(path.toString());
+		
 		return fileData;
 	}
-
-	public InputStream getFile(String path) throws IOException {
-		// if (environment.getProperty(fileEnvironment) == null) {
-		// throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO
-		// ".concat(fileEnvironment).concat(" EN SU EQUIPO"));
-		// }
-		// StringBuilder path = new
-		// StringBuilder(environment.getProperty(fileEnvironment));
-		// path.append(File.separator);
-		// path.append(module);
-		// path.append(File.separator);
-		// path.append(fileName);
-		File serverFile = new File(path);
-		return new FileInputStream(serverFile);
-	}
-
-	public void deleteFile(String module, String fileName) throws IOException {
+	
+	public InputStream getFile(String name, String module) throws IOException {
 		if (environment.getProperty(fileEnvironment) == null) {
 			throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO ".concat(fileEnvironment).concat(" EN SU EQUIPO"));
 		}
-
+		
 		StringBuilder path = new StringBuilder(environment.getProperty(fileEnvironment));
 		path.append(File.separator);
-		path.append(module);
+		
+		if (module != null && !module.isEmpty()) {
+			path.append(module);
+			path.append(File.separator);
+		}
+		
+		path.append(name);
+		File file = new File(path.toString());
+		
+		return new FileInputStream(file);
+	}
+
+	public boolean deleteFile(String name, String module) throws IOException {
+		if (environment.getProperty(fileEnvironment) == null) {
+			throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO ".concat(fileEnvironment).concat(" EN SU EQUIPO"));
+		}
+		
+		StringBuilder path = new StringBuilder(environment.getProperty(fileEnvironment));
 		path.append(File.separator);
-		path.append(fileName);
+		
+		if (module != null && !module.isEmpty()) {
+			path.append(module);
+			path.append(File.separator);
+		}
+		
+		path.append(name);
 		File file = new File(path.toString());
 
 		if (file.exists()) {
-			file.delete();
+			return file.delete();
 		}
+		
+		return false;
 	}
 
-	private FileData sameFileName(String path, int counter) throws ServletException {
-		File serverFile = new File(path);
+	private String renameIfDuplicate(String path, String name, int counter) throws ServletException {
+		File file = new File(path + name);
+		
+		if (file.exists()) {
+			counter++;
+			int openIndex = 0;
+			for (int i = 1; i < name.length(); i++) {
+				if (name.substring(i-1, i).equals("(")) {
+					openIndex = i;
+					break;
+				}
+			}
+			
+			int closeIndex = 0;
+			for (int i = 1; i < name.length(); i++) {
+				if (name.substring(i-1, i).equals(")")) {
+					closeIndex = i-1;
+					break;
+				}
+			}
+			
+			if (openIndex != 0 && closeIndex != 0 && isInteger(name.substring(openIndex, closeIndex))) {
+				name = name.substring(0, openIndex-1) + " (" + counter + ")" + name.substring(closeIndex+1);
+			} else {
+				int dotIndex = 0;
+				for (int i = name.length()-1; i >= 0; i--) {
+					if (i-1 >= 0 && name.substring(i-1, i).equals(".")) {
+						dotIndex = i-1;
+						break;
+					}
+				}
+				
+				name = name.substring(0, dotIndex) + " (" + counter + ")" + name.substring(dotIndex);
+			}
+			
+			name = renameIfDuplicate(path, name, counter);
+		}
+		
+		return name;
+		
+		/*File serverFile = new File(path);
 		String[] split = null;
 		if (serverFile.exists()) {
 			try {
@@ -109,7 +172,7 @@ public class DocumentService {
 					fullName.append(".");
 				}
 			}
-			return sameFileName(fullName.toString(), counter);
+			return renameIfDuplicate(fullName.toString(), counter);
 		}
 
 		FileData fileData = new FileData();
@@ -120,6 +183,20 @@ public class DocumentService {
 			split = path.toString().split(File.separator);
 		}
 		fileData.setName(split[split.length - 1]);
-		return fileData;
+		return fileData;*/
+	}
+	
+	private boolean isInteger(String value) {
+		try {
+			int number = Integer.parseInt(value);
+			
+			if (number > 0) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 }

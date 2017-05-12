@@ -4,31 +4,31 @@ import java.util.Date;
 import java.util.List;
 
 public interface SecurityConfig {
-	public Long getUserId(String username);
+	public Long getUserId(String username, String extra);
 	
-	public String getPassword(String username);
+	public String getPassword(String username, String extra);
 	
-	public List<String> getRoles(String username);
+	public List<String> getRoles(String username, String extra);
 	
-	public Boolean getIsLoked(String username);
+	public Boolean getIsLoked(String username, String extra);
 	
-	public Date getLockDate(String username);
+	public Date getLockDate(String username, String extra);
 	
-	public void setLockDate(String username, Date date);
+	public void setLockDate(String username, Date date, String extra);
 	
 	public Double getLockTimeMinutes();
 	
-	public Date getLastFailedAttempt(String username);
+	public Date getLastFailedAttempt(String username, String extra);
 	
-	public void setLastFailedAttempt(String username, Date date);
+	public void setLastFailedAttempt(String username, Date date, String extra);
 	
-	public Integer getNumberOfAttempts(String username);
+	public Integer getNumberOfAttempts(String username, String extra);
 	
-	public void setNumberOfAttempts(String username, Integer attempts);
+	public void setNumberOfAttempts(String username, Integer attempts, String extra);
 	
 	public Integer getMaxAttempts();
 	
 	public Double getResetTimeHours();
 	
-	public boolean resetUserPassword(String username);
+	public boolean resetUserPassword(String username, String extra);
 }
