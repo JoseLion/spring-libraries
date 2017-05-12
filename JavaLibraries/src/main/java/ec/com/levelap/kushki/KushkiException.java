@@ -1,7 +1,7 @@
 /**
  * @Copyright:	Levelap 2017
  * @Class:		KushkiException.java
- * @Created:	23-03-2016
+ * @Created:	23-03-2017
  * @Updated:	
  */
 package ec.com.levelap.kushki;

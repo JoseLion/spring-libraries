@@ -1,8 +1,8 @@
 /**
  * @Copyright:	Levelap 2017
  * @Class:		KushkiAmount.java
- * @Created:	23-03-2016
- * @Updated:	
+ * @Created:	23-03-2017
+ * @Updated:	12-05-2017
  */
 package ec.com.levelap.kushki.object;
 
@@ -27,15 +27,6 @@ public class KushkiAmount {
 	 * {@link KushkiAmount} default constructor.
 	 */
 	public KushkiAmount() {
-	}
-
-	/**
-	 * {@link KushkiAmount} constructor with parameters.
-	 * 
-	 * @param subtotalIva
-	 */
-	public KushkiAmount(Double subtotalIva) {
-		this.subtotalIva = subtotalIva;
 	}
 
 	/**
