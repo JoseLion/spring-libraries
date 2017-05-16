@@ -15,7 +15,7 @@ import ec.com.levelap.commons.service.DocumentService;
 @Service
 public class ArchiveService {
 	@Autowired
-	private ArchiveRepository archiveRepository;
+	private ArchiveRepo archiveRepository;
 
 	@Autowired
 	private DocumentService documentService;
@@ -29,7 +29,7 @@ public class ArchiveService {
 		inputStream.close();
 	}
 
-	public ArchiveRepository getArchiveRepository() {
+	public ArchiveRepo getArchiveRepository() {
 		return archiveRepository;
 	}
 
