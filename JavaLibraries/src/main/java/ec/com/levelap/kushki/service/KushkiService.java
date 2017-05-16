@@ -79,11 +79,13 @@ public class KushkiService extends KushkiServiceIntegration {
 		Map<String, Object> kushkiRequest = new HashMap<>();
 		kushkiRequest.put("token", token);
 		kushkiRequest.put("amount", amount);
-		if (optionals[0].get("months") == null) {
-			kushkiRequest.put("months", optionals[0].get("months"));
-		}
-		if (optionals[0].get("metadata") == null) {
-			kushkiRequest.put("metadata", optionals[0].get("metadata"));
+		if (optionals.length > 0) {
+			if (optionals[0].get("months") == null) {
+				kushkiRequest.put("months", optionals[0].get("months"));
+			}
+			if (optionals[0].get("metadata") == null) {
+				kushkiRequest.put("metadata", optionals[0].get("metadata"));
+			}
 		}
 		return (String) super.doOperation(KushkiServicesEnum.TRANSACTION_CHARGE, kushkiRequest);
 	}
@@ -108,8 +110,10 @@ public class KushkiService extends KushkiServiceIntegration {
 	@SuppressWarnings("unchecked")
 	public String voidTransactionCharge(final String ticketNumber, final Map<String, Object>... optionals) throws ServletException, KushkiException {
 		Map<String, Object> kushkiRequest = new HashMap<>();
-		if (optionals[0].get("amount") == null) {
-			kushkiRequest.put("amount", optionals[0].get("amount"));
+		if (optionals.length > 0) {
+			if (optionals[0].get("amount") == null) {
+				kushkiRequest.put("amount", optionals[0].get("amount"));
+			}
 		}
 		Map<String, Object> params = new HashMap<>();
 		params.put("ticketNumber", ticketNumber);
@@ -160,11 +164,13 @@ public class KushkiService extends KushkiServiceIntegration {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date today = Calendar.getInstance().getTime();
 		kushkiRequest.put("startDate", dateFormat.format(today));
-		if (optionals[0].get("language") == null) {
-			kushkiRequest.put("language", optionals[0].get("language"));
-		}
-		if (optionals[0].get("metadata") == null) {
-			kushkiRequest.put("metadata", optionals[0].get("metadata"));
+		if (optionals.length > 0) {
+			if (optionals[0].get("language") == null) {
+				kushkiRequest.put("language", optionals[0].get("language"));
+			}
+			if (optionals[0].get("metadata") == null) {
+				kushkiRequest.put("metadata", optionals[0].get("metadata"));
+			}
 		}
 		return (String) super.doOperation(KushkiServicesEnum.SUBSCRIPTION_CREATE, kushkiRequest);
 	}
@@ -186,8 +192,10 @@ public class KushkiService extends KushkiServiceIntegration {
 	@Transactional
 	public Boolean subscriptionCancel(final String subscriptionId, final Map<String, Object>... optionals) throws ServletException, KushkiException {
 		Map<String, Object> kushkiRequest = new HashMap<>();
-		if (optionals[0].get("language") == null) {
-			kushkiRequest.put("language", optionals[0].get("language"));
+		if (optionals.length > 0) {
+			if (optionals[0].get("language") == null) {
+				kushkiRequest.put("language", optionals[0].get("language"));
+			}
 		}
 		Map<String, Object> params = new HashMap<>();
 		params.put("subscriptionId", subscriptionId);
@@ -226,26 +234,28 @@ public class KushkiService extends KushkiServiceIntegration {
 	@SuppressWarnings({ "unchecked" })
 	public Boolean subscriptionUpdate(final String subscriptionId, final Map<String, Object>... optionals) throws ServletException, KushkiException {
 		Map<String, Object> kushkiRequest = new HashMap<>();
-		if (optionals[0].get("planName") != null) {
-			kushkiRequest.put("planName", optionals[0].get("planName"));
-		}
-		if (optionals[0].get("periodicity") != null) {
-			kushkiRequest.put("periodicity", optionals[0].get("periodicity"));
-		}
-		if (optionals[0].get("contactDetails") != null) {
-			kushkiRequest.put("contactDetails", optionals[0].get("contactDetails"));
-		}
-		if (optionals[0].get("amount") != null) {
-			kushkiRequest.put("amount", optionals[0].get("amount"));
-		}
-		if (optionals[0].get("startDate") != null) {
-			kushkiRequest.put("startDate", optionals[0].get("startDate"));
-		}
-		if (optionals[0].get("language") != null) {
-			kushkiRequest.put("language", optionals[0].get("language"));
-		}
-		if (optionals[0].get("metadata") != null) {
-			kushkiRequest.put("metadata", optionals[0].get("metadata"));
+		if (optionals.length > 0) {
+			if (optionals[0].get("planName") != null) {
+				kushkiRequest.put("planName", optionals[0].get("planName"));
+			}
+			if (optionals[0].get("periodicity") != null) {
+				kushkiRequest.put("periodicity", optionals[0].get("periodicity"));
+			}
+			if (optionals[0].get("contactDetails") != null) {
+				kushkiRequest.put("contactDetails", optionals[0].get("contactDetails"));
+			}
+			if (optionals[0].get("amount") != null) {
+				kushkiRequest.put("amount", optionals[0].get("amount"));
+			}
+			if (optionals[0].get("startDate") != null) {
+				kushkiRequest.put("startDate", optionals[0].get("startDate"));
+			}
+			if (optionals[0].get("language") != null) {
+				kushkiRequest.put("language", optionals[0].get("language"));
+			}
+			if (optionals[0].get("metadata") != null) {
+				kushkiRequest.put("metadata", optionals[0].get("metadata"));
+			}
 		}
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("subscriptionId", subscriptionId);
@@ -275,17 +285,19 @@ public class KushkiService extends KushkiServiceIntegration {
 	@SuppressWarnings({ "unchecked" })
 	public String subscriptionCharge(final String subscriptionId, final Map<String, Object>... optionals) throws ServletException, KushkiException {
 		Map<String, Object> kushkiRequest = new HashMap<>();
-		if (optionals[0].get("amount") != null) {
-			kushkiRequest.put("amount", optionals[0].get("amount"));
-		}
-		if (optionals[0].get("cvv") != null) {
-			kushkiRequest.put("cvv", optionals[0].get("cvv"));
-		}
-		if (optionals[0].get("language") != null) {
-			kushkiRequest.put("language", optionals[0].get("language"));
-		}
-		if (optionals[0].get("metadata") != null) {
-			kushkiRequest.put("metadata", optionals[0].get("metadata"));
+		if (optionals.length > 0) {
+			if (optionals[0].get("amount") != null) {
+				kushkiRequest.put("amount", optionals[0].get("amount"));
+			}
+			if (optionals[0].get("cvv") != null) {
+				kushkiRequest.put("cvv", optionals[0].get("cvv"));
+			}
+			if (optionals[0].get("language") != null) {
+				kushkiRequest.put("language", optionals[0].get("language"));
+			}
+			if (optionals[0].get("metadata") != null) {
+				kushkiRequest.put("metadata", optionals[0].get("metadata"));
+			}
 		}
 		Map<String, Object> params = new HashMap<>();
 		params.put("subscriptionId", subscriptionId);
