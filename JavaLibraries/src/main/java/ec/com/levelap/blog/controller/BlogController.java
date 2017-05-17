@@ -37,7 +37,7 @@ public class BlogController {
 			search = new Search();
 		}
 		
-		Page<BlogArticleLite> articles = blogService.getBlogArticleRepo().findArticles(search.title, search.status, search.startDate, search.endDate, search.category, search.tags, search.isFeatured, new PageRequest(search.page, BlogConst.TABLE_SIZE));
+		Page<BlogArticleLite> articles = blogService.getBlogArticleRepo().findArticles(search.title, search.status, search.startDate, search.endDate, search.category, search.tags, /*search.isFeatured,*/ new PageRequest(search.page, BlogConst.TABLE_SIZE));
 		
 		for (BlogArticleLite lite : articles.getContent()) {
 			BlogArticle article = blogService.getBlogArticleRepo().findOne(lite.getId());

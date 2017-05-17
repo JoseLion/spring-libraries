@@ -17,19 +17,19 @@ import ec.com.levelap.base.entity.BaseEntity;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BlogTag extends BaseEntity {
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.DETACH, optional=false)
-	@JoinColumn(name="blog_content", foreignKey=@ForeignKey(name="blog_content_fk"))
-	private BlogArticle blogContent;
+	@JoinColumn(name="blog_article", foreignKey=@ForeignKey(name="blog_article_fk"))
+	private BlogArticle blogArticle;
 	
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.DETACH, optional=false)
 	@JoinColumn(name="blog_extra", foreignKey=@ForeignKey(name="blog_extra_fk"))
 	private BlogExtra blogExtra;
 
-	public BlogArticle getBlogContent() {
-		return blogContent;
+	public BlogArticle getBlogArticle() {
+		return blogArticle;
 	}
 
-	public void setBlogContent(BlogArticle blogContent) {
-		this.blogContent = blogContent;
+	public void setBlogArticle(BlogArticle blogArticle) {
+		this.blogArticle = blogArticle;
 	}
 
 	public BlogExtra getBlogExtra() {

@@ -22,7 +22,7 @@ import ec.com.levelap.base.entity.BaseEntity;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BlogComment extends BaseEntity {
 	@Column(columnDefinition="VARCHAR")
-	private String user;
+	private String username;
 	
 	@Column(columnDefinition="VARCHAR")
 	private String email;
@@ -41,12 +41,12 @@ public class BlogComment extends BaseEntity {
 	@JoinColumn(name="blog_article", foreignKey=@ForeignKey(name="blog_article_fk"))
 	private BlogArticle blogArticle;
 
-	public String getUser() {
-		return user;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getEmail() {
@@ -83,5 +83,13 @@ public class BlogComment extends BaseEntity {
 
 	public void setChildren(List<BlogComment> children) {
 		this.children = children;
+	}
+
+	public BlogArticle getBlogArticle() {
+		return blogArticle;
+	}
+
+	public void setBlogArticle(BlogArticle blogArticle) {
+		this.blogArticle = blogArticle;
 	}
 }
