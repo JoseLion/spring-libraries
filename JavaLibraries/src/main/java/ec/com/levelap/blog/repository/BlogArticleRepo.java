@@ -21,18 +21,17 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 				"a.title AS title, " +
 				"a.status AS status, " +
 				"a.creationDate AS creationDate, " +
-				"c AS category, " +
+				"a.category AS category, " +
 				"a.isFeatured AS isFeatured " +
 			"FROM BlogArticle a " +
-				"LEFT JOIN a.category c " +
 				"LEFT JOIN a.tags t " +
 			"WHERE " +
 				"UPPER(a.title) LIKE UPPER('%' || :title || '%') AND " +
 				"(:status IS NULL OR a.status=:status) AND " +
-				"(DATE(a.creationDate) BETWEEN DATE(:startDate) AND DATE(:endDate)) AND " +
-				"(:category IS NULL OR c=:category) AND " +
-				"(:tags IS NULL OR :tags IS EMPTY OR t IN :tags) " +
-				/*"(:isFeatured IS NULL OR a.isFeatured=:isFeatured) " +*/
+				"DATE(a.creationDate) BETWEEN DATE(:startDate) AND DATE(:endDate) AND " +
+				"(:category IS NULL OR a.category=:category) AND " +
+				"(:isTagsEmpty=TRUE OR t IN :tags) AND " +
+				"(:isFeatured IS NULL OR a.isFeatured=:isFeatured) " +
 			"ORDER BY a.creationDate DESC")
 	public Page<BlogArticleLite> findArticles(
 		@Param("title") String title,
@@ -40,8 +39,9 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 		@Param("startDate") Date startDate,
 		@Param("endDate") Date endDate,
 		@Param("category") BlogExtra category,
+		@Param("isTagsEmpty") Boolean isTagsEmpty,
 		@Param("tags") List<BlogExtra> tags,
-		/*@Param("isFeatured") Boolean isFeatured,*/
+		@Param("isFeatured") Boolean isFeatured,
 		Pageable page
 	);
 }

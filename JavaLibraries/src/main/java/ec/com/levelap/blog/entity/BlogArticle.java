@@ -30,8 +30,14 @@ public class BlogArticle extends BaseEntity {
 	@JoinColumn(name="banner", foreignKey=@ForeignKey(name="banner_archive_fk"))
 	private Archive banner;
 	
+	@Column(columnDefinition="VARCHAR")
+	private String summary;
+	
 	@Column(columnDefinition="TEXT", nullable=false)
 	private String body;
+	
+	@Column(columnDefinition="VARCHAR")
+	private String author;
 	
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinColumn(name="category", foreignKey=@ForeignKey(name="category_blog_extra_fk"))
@@ -43,6 +49,9 @@ public class BlogArticle extends BaseEntity {
 	
 	@Column(name="is_featured", columnDefinition="BOOLEAN DEFAULT FALSE")
 	private Boolean isFeatured = false;
+	
+	@Column(name="times_seen", columnDefinition="INTEGER DEFAULT 0")
+	private Integer timesSeen = 0;
 
 	public String getTitle() {
 		return title;
@@ -60,12 +69,28 @@ public class BlogArticle extends BaseEntity {
 		this.banner = banner;
 	}
 
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
 	public String getBody() {
 		return body;
 	}
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 
 	public BlogExtra getCategory() {
@@ -90,5 +115,13 @@ public class BlogArticle extends BaseEntity {
 
 	public void setIsFeatured(Boolean isFeatured) {
 		this.isFeatured = isFeatured;
+	}
+
+	public Integer getTimesSeen() {
+		return timesSeen;
+	}
+
+	public void setTimesSeen(Integer timesSeen) {
+		this.timesSeen = timesSeen;
 	}
 }

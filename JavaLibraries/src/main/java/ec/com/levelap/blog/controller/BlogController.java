@@ -26,7 +26,7 @@ import ec.com.levelap.blog.service.BlogService;
 import ec.com.levelap.blog.util.BlogConst;
 
 @RestController
-@RequestMapping(value = "/api/blog", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/levelapBlog", produces = MediaType.APPLICATION_JSON_VALUE)
 public class BlogController {
 	@Autowired
 	private BlogService blogService;
@@ -37,7 +37,7 @@ public class BlogController {
 			search = new Search();
 		}
 		
-		Page<BlogArticleLite> articles = blogService.getBlogArticleRepo().findArticles(search.title, search.status, search.startDate, search.endDate, search.category, search.tags, /*search.isFeatured,*/ new PageRequest(search.page, BlogConst.TABLE_SIZE));
+		Page<BlogArticleLite> articles = blogService.getBlogArticleRepo().findArticles(search.title, search.status, search.startDate, search.endDate, search.category, (search.tags == null || search.tags.isEmpty() ? true : false), search.tags, search.isFeatured, new PageRequest(search.page, BlogConst.TABLE_SIZE));
 		
 		for (BlogArticleLite lite : articles.getContent()) {
 			BlogArticle article = blogService.getBlogArticleRepo().findOne(lite.getId());
