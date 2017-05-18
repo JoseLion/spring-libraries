@@ -43,7 +43,7 @@ public class BlogArticle extends BaseEntity {
 	@JoinColumn(name="category", foreignKey=@ForeignKey(name="category_blog_extra_fk"))
 	private BlogExtra category;
 	
-	@ManyToMany(targetEntity=BlogTag.class, fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(name="blog_tag", schema="blog", joinColumns=@JoinColumn(name="blog_article", foreignKey=@ForeignKey(name="blog_article_fk")), inverseJoinColumns=@JoinColumn(name="blog_extra", foreignKey=@ForeignKey(name="blog_extra_fk")))
 	private List<BlogExtra> tags = new ArrayList<>();
 	

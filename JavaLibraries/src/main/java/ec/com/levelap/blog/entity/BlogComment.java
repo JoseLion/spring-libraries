@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -40,6 +41,15 @@ public class BlogComment extends BaseEntity {
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.DETACH)
 	@JoinColumn(name="blog_article", foreignKey=@ForeignKey(name="blog_article_fk"))
 	private BlogArticle blogArticle;
+	
+	@Transient
+	private Integer level = 0;
+	
+	@Transient
+	private Long parentId;
+	
+	@Transient
+	private Long articleId;
 
 	public String getUsername() {
 		return username;
@@ -91,5 +101,37 @@ public class BlogComment extends BaseEntity {
 
 	public void setBlogArticle(BlogArticle blogArticle) {
 		this.blogArticle = blogArticle;
+	}
+
+	public Integer getLevel() {
+		this.level = 0;
+		BlogComment currentParent = this.parent;
+		
+		while (currentParent != null) {
+			this.level++;
+			currentParent = currentParent.getParent();
+		}
+		
+		return level;
+	}
+
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+
+	public Long getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Long parentId) {
+		this.parentId = parentId;
+	}
+
+	public Long getArticleId() {
+		return articleId;
+	}
+
+	public void setArticleId(Long articleId) {
+		this.articleId = articleId;
 	}
 }
