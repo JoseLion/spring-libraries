@@ -11,7 +11,7 @@ import ec.com.levelap.blog.entity.BlogComment;
 
 @Repository
 public interface BlogCommentRepo extends JpaRepository<BlogComment, Long> {
-	public Page<BlogComment> findByBlogArticleId(Long articleId, Pageable page);
+	public Page<BlogComment> findByParentIsNullAndBlogArticleIdOrderByCreationDateDesc(Long articleId, Pageable page);
 	
-	public List<BlogComment> findByParent_Id(Long parentId);
+	public List<BlogComment> findByParent_IdOrderByCreationDateDesc(Long parentId);
 }

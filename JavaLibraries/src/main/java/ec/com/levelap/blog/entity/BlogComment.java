@@ -46,6 +46,9 @@ public class BlogComment extends BaseEntity {
 	private Integer level = 0;
 	
 	@Transient
+	private Integer childrenSize;
+	
+	@Transient
 	private Long parentId;
 	
 	@Transient
@@ -117,6 +120,20 @@ public class BlogComment extends BaseEntity {
 
 	public void setLevel(Integer level) {
 		this.level = level;
+	}
+
+	public Integer getChildrenSize() {
+		this.childrenSize = 0;
+		
+		if (this.children != null) {
+			this.childrenSize = this.children.size();
+		}
+		
+		return this.childrenSize;
+	}
+
+	public void setChildrenSize(Integer childrenSize) {
+		this.childrenSize = childrenSize;
 	}
 
 	public Long getParentId() {

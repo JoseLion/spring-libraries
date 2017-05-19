@@ -73,7 +73,11 @@ public class BlogService {
 	@Transactional
 	public BlogComment saveComment(BlogComment comment) throws ServletException {
 		BlogArticle article = blogArticleRepo.findOne(comment.getArticleId());
-		BlogComment parent = blogCommentRepo.findOne(comment.getParentId());
+		BlogComment parent = null;
+		
+		if (comment.getParentId() != null) {
+			parent = blogCommentRepo.findOne(comment.getParentId());
+		}
 		
 		comment.setBlogArticle(article);
 		comment.setParent(parent);

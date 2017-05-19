@@ -57,7 +57,7 @@ public class BlogOpenController {
 			page = 0;
 		}
 		
-		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByBlogArticleId(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
+		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateDesc(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
 		
 		for (BlogComment comment : comments.getContent()) {
 			comment.setChildren(new ArrayList<>());
@@ -68,7 +68,7 @@ public class BlogOpenController {
 	
 	@RequestMapping(value="getRepliesOf/{parentId}", method=RequestMethod.GET)
 	public ResponseEntity<List<BlogComment>> getRepliesOf(@PathVariable Long parentId) throws ServletException {
-		List<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_Id(parentId);
+		List<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateDesc(parentId);
 		return new ResponseEntity<List<BlogComment>>(replies, HttpStatus.OK);
 	}
 	
