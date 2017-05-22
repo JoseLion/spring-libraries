@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import ec.com.levelap.blog.entity.BlogArticle;
 import ec.com.levelap.blog.entity.BlogArticleLite;
+import ec.com.levelap.blog.entity.BlogArticleOpen;
 import ec.com.levelap.blog.entity.BlogExtra;
 
 @Repository
@@ -44,4 +45,26 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 		@Param("isFeatured") Boolean isFeatured,
 		Pageable page
 	);
+
+	@Query(value = "SELECT DISTINCT "
+			+ "     a.id AS id, "
+			+ "     a.title AS title, "
+			+ "     a.creationDate AS creationDate, "
+			+ "     c AS category, "
+			+ "     a.banner AS banner, "
+			+ "     a.author AS author, "
+			+ "     a.summary AS summary "
+			+ "FROM BlogArticle a "
+			+ "     LEFT JOIN a.category c "
+			+ "     LEFT JOIN a.tags t "
+			+ "WHERE "
+			+ "     a.status IS TRUE "
+			+ "     AND (:isFeatured IS NULL OR a.isFeatured = :isFeatured) "
+			+ "     AND (:isMostSeen IS NULL OR a.timesSeen > 0) "
+			+ "ORDER BY a.creationDate DESC ")
+	public Page<BlogArticleOpen> findArticles(
+			@Param("isFeatured") Boolean isFeatured,
+			@Param("isMostSeen") Boolean isMostSeen,
+			Pageable page);
+
 }

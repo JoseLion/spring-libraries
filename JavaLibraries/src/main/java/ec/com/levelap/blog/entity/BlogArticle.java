@@ -39,7 +39,7 @@ public class BlogArticle extends BaseEntity {
 	@Column(columnDefinition="VARCHAR")
 	private String author;
 	
-	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL, optional = true)
 	@JoinColumn(name="category", foreignKey=@ForeignKey(name="category_blog_extra_fk"))
 	private BlogExtra category;
 	
