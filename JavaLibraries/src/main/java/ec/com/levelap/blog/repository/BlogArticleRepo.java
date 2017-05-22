@@ -105,9 +105,11 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 			+ "     LEFT JOIN a.tags t "
 			+ "WHERE "
 			+ "     a.status IS TRUE "
-			+ "     OR a.title LIKE '%' || ?1 || '%' "
-			+ "     OR c.text LIKE '%' || ?1 || '%' "
-			+ "     OR t.text LIKE '%' || ?1 || '%' "
+			+ "     AND ("
+			+ "          UPPER(a.title) LIKE '%' || UPPER(?1) || '%' "
+			+ "          OR UPPER(c.text) LIKE '%' || UPPER(?1) || '%' "
+			+ "          OR UPPER(t.text) LIKE '%' || UPPER(?1) || '%' "
+			+ "     ) "
 			+ "ORDER BY a.creationDate DESC ")
 	public Page<BlogArticleOpen> searchArticles(String text, Pageable page);
 	
