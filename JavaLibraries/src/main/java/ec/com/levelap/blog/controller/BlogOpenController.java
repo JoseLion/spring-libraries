@@ -36,7 +36,7 @@ public class BlogOpenController {
 
 	@Value("${levelap.blog.important-size}")
 	private Integer importantSize;
-	
+
 	@Value("${levelap.blog.most-seen-size}")
 	private Integer mostSeenSize;
 
@@ -67,7 +67,7 @@ public class BlogOpenController {
 			page = 0;
 		}
 
-		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByBlogArticleId(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
+		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateDesc(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
 
 		for (BlogComment comment : comments.getContent()) {
 			comment.setChildren(new ArrayList<>());
@@ -78,7 +78,7 @@ public class BlogOpenController {
 
 	@RequestMapping(value = "getRepliesOf/{parentId}", method = RequestMethod.GET)
 	public ResponseEntity<List<BlogComment>> getRepliesOf(@PathVariable Long parentId) throws ServletException {
-		List<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_Id(parentId);
+		List<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateDesc(parentId);
 		return new ResponseEntity<List<BlogComment>>(replies, HttpStatus.OK);
 	}
 
@@ -92,9 +92,9 @@ public class BlogOpenController {
 	public ResponseEntity<?> findArticles(@RequestBody Search search) throws ServletException {
 		if (search.isHomePage != null && search.isHomePage) {
 			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, homePageSize)), HttpStatus.OK);
-		} else if(search.isFeatured != null && search.isFeatured) {
-			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, importantSize)), HttpStatus.OK);			
-		} else if(search.isMostSeen != null && search.isMostSeen) {
+		} else if (search.isFeatured != null && search.isFeatured) {
+			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, importantSize)), HttpStatus.OK);
+		} else if (search.isMostSeen != null && search.isMostSeen) {
 			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, mostSeenSize)), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(null, HttpStatus.OK);
@@ -107,7 +107,7 @@ public class BlogOpenController {
 		public Boolean isFeatured;
 
 		public Boolean isMostSeen;
-		
+
 		public Boolean isSearch;
 
 		public Integer page = 0;

@@ -90,13 +90,13 @@ public class BlogController {
 		return new ResponseEntity<Boolean>(article.getStatus(), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="getCommentsOf/{articleId}/{page}")
+	@RequestMapping(value="getCommentsOf/{articleId}/{page}", method=RequestMethod.GET)
 	public ResponseEntity<Page<BlogComment>> getCommentsOf(@PathVariable Long articleId, @PathVariable(required=false) Integer page) throws ServletException {
 		if (page == null) {
 			page = 0;
 		}
 		
-		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByBlogArticleId(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
+		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateDesc(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
 		
 		for (BlogComment comment : comments.getContent()) {
 			comment.setChildren(new ArrayList<>());
@@ -107,7 +107,7 @@ public class BlogController {
 	
 	@RequestMapping(value="getRepliesOf/{parentId}", method=RequestMethod.GET)
 	public ResponseEntity<List<BlogComment>> getRepliesOf(@PathVariable Long parentId) throws ServletException {
-		List<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_Id(parentId);
+		List<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateDesc(parentId);
 		return new ResponseEntity<List<BlogComment>>(replies, HttpStatus.OK);
 	}
 	
@@ -115,6 +115,15 @@ public class BlogController {
 	public ResponseEntity<BlogComment> saveComment(@RequestBody BlogComment comment) throws ServletException {
 		comment = blogService.saveComment(comment);
 		return new ResponseEntity<BlogComment>(comment, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="changeCommentStatus/{id}", method=RequestMethod.GET)
+	public ResponseEntity<Boolean> changeCommentStatus(@PathVariable Long id) throws ServletException {
+		BlogComment comment = blogService.getBlogCommentRepo().findOne(id);
+		comment.setStatus(!comment.getStatus());
+		comment = blogService.getBlogCommentRepo().save(comment);
+		
+		return new ResponseEntity<Boolean>(comment.getStatus(), HttpStatus.OK);
 	}
  	
 	private static class Search {
