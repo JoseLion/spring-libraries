@@ -107,6 +107,8 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 			+ "     a.status IS TRUE "
 			+ "     AND ("
 			+ "          UPPER(a.title) LIKE '%' || UPPER(?1) || '%' "
+			+ "          OR UPPER(a.body) LIKE '%' || UPPER(?1) || '%' "
+			+ "          OR UPPER(a.summary) LIKE '%' || UPPER(?1) || '%' "
 			+ "          OR UPPER(c.text) LIKE '%' || UPPER(?1) || '%' "
 			+ "          OR UPPER(t.text) LIKE '%' || UPPER(?1) || '%' "
 			+ "     ) "
