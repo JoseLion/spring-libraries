@@ -1,9 +1,7 @@
 package ec.com.levelap.blog.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -62,10 +60,18 @@ public class BlogController {
 		return blogService.saveArticle(article, banner);
 	}
 	
-	@RequestMapping(value="findBlogExtra", method=RequestMethod.POST)
-	public ResponseEntity<List<BlogExtra>> findBlogExtra(@RequestBody HashMap<String, String> search) throws ServletException {
-		String text = search.get("text") != null ? search.get("text") : "";
-		List<BlogExtra> extras = blogService.getBlogExtraRepo().findByTextContainingAndIsTag(text, Boolean.parseBoolean(search.get("isTag")));
+	@RequestMapping(value="changeArticleStatus/{id}", method=RequestMethod.GET)
+	public ResponseEntity<Boolean> changeArticleStatus(@PathVariable Long id) throws ServletException {
+		BlogArticle article = blogService.getBlogArticleRepo().findOne(id);
+		article.setStatus(!article.getStatus());
+		article = blogService.getBlogArticleRepo().save(article);
+		
+		return new ResponseEntity<Boolean>(article.getStatus(), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="findBlogExtra/{isTag}", method=RequestMethod.GET)
+	public ResponseEntity<List<BlogExtra>> findBlogExtra(@PathVariable Boolean isTag) throws ServletException {
+		List<BlogExtra> extras = blogService.getBlogExtraRepo().findByIsTag(isTag);
 		return new ResponseEntity<List<BlogExtra>>(extras, HttpStatus.OK);
 	}
 	
@@ -81,13 +87,18 @@ public class BlogController {
 		return new ResponseEntity<List<BlogExtra>>(tags, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="changeArticleStatus/{id}", method=RequestMethod.GET)
-	public ResponseEntity<Boolean> changeArticleStatus(@PathVariable Long id) throws ServletException {
-		BlogArticle article = blogService.getBlogArticleRepo().findOne(id);
-		article.setStatus(!article.getStatus());
-		article = blogService.getBlogArticleRepo().save(article);
+	@RequestMapping(value="saveBlogExtra", method=RequestMethod.POST)
+	public ResponseEntity<?> saveBlogExtra(@RequestBody BlogExtra blogExtra) throws ServletException {
+		return blogService.saveBlogExtra(blogExtra);
+	}
+	
+	@RequestMapping(value="changeBlogExtraStatus/{id}", method=RequestMethod.GET)
+	public ResponseEntity<Boolean> changeBlogExtraStatus(@PathVariable Long id) throws ServletException {
+		BlogExtra extra = blogService.getBlogExtraRepo().findOne(id);
+		extra.setStatus(!extra.getStatus());
+		extra = blogService.getBlogExtraRepo().save(extra);
 		
-		return new ResponseEntity<Boolean>(article.getStatus(), HttpStatus.OK);
+		return new ResponseEntity<Boolean>(extra.getStatus(), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="getCommentsOf/{articleId}/{page}", method=RequestMethod.GET)
@@ -97,18 +108,17 @@ public class BlogController {
 		}
 		
 		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateDesc(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
-		
-		for (BlogComment comment : comments.getContent()) {
-			comment.setChildren(new ArrayList<>());
-		}
-		
 		return new ResponseEntity<Page<BlogComment>>(comments, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="getRepliesOf/{parentId}", method=RequestMethod.GET)
-	public ResponseEntity<List<BlogComment>> getRepliesOf(@PathVariable Long parentId) throws ServletException {
-		List<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateDesc(parentId);
-		return new ResponseEntity<List<BlogComment>>(replies, HttpStatus.OK);
+	@RequestMapping(value="getRepliesOf/{parentId}/{page}", method=RequestMethod.GET)
+	public ResponseEntity<Page<BlogComment>> getRepliesOf(@PathVariable Long parentId, @PathVariable(required=false) Integer page) throws ServletException {
+		if (page == null) {
+			page = 0;
+		}
+		
+		Page<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateDesc(parentId, new PageRequest(page, BlogConst.TABLE_SIZE));
+		return new ResponseEntity<Page<BlogComment>>(replies, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="saveComment", method=RequestMethod.POST)
@@ -117,13 +127,31 @@ public class BlogController {
 		return new ResponseEntity<BlogComment>(comment, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="changeCommentStatus/{id}", method=RequestMethod.GET)
-	public ResponseEntity<Boolean> changeCommentStatus(@PathVariable Long id) throws ServletException {
+	@RequestMapping(value="changeCommentStatus/{id}/{recursively}", method=RequestMethod.GET)
+	public ResponseEntity<Boolean> changeCommentStatus(@PathVariable Long id, @PathVariable Boolean recursively) throws ServletException {
 		BlogComment comment = blogService.getBlogCommentRepo().findOne(id);
-		comment.setStatus(!comment.getStatus());
-		comment = blogService.getBlogCommentRepo().save(comment);
+		
+		if (!recursively) {
+			comment.setStatus(!comment.getStatus());
+			comment = blogService.getBlogCommentRepo().save(comment);
+		} else {
+			comment = changeStatusRecursively(comment, !comment.getStatus());
+		}
 		
 		return new ResponseEntity<Boolean>(comment.getStatus(), HttpStatus.OK);
+	}
+	
+	private BlogComment changeStatusRecursively(BlogComment comment, Boolean status) {
+		comment.setStatus(status);
+		
+		if (comment.getChildren() != null && comment.getChildren().size() > 0) {
+			for (BlogComment child : comment.getChildren()) {
+				child = changeStatusRecursively(child, status);
+			}
+		}
+		
+		comment = blogService.getBlogCommentRepo().save(comment);
+		return comment;
 	}
  	
 	private static class Search {

@@ -15,9 +15,11 @@ import ec.com.levelap.blog.repository.BlogCommentRepo;
 import ec.com.levelap.blog.repository.BlogExtraRepo;
 import ec.com.levelap.commons.archive.Archive;
 import ec.com.levelap.commons.service.DocumentService;
+import ec.com.levelap.base.entity.ErrorControl;
 import ec.com.levelap.base.entity.FileData;
 import ec.com.levelap.blog.entity.BlogArticle;
 import ec.com.levelap.blog.entity.BlogComment;
+import ec.com.levelap.blog.entity.BlogExtra;
 import ec.com.levelap.blog.repository.BlogArticleRepo;
 
 @Service
@@ -84,5 +86,26 @@ public class BlogService {
 		
 		comment = blogCommentRepo.save(comment);
 		return comment;
+	}
+	
+	@Transactional
+	public ResponseEntity<?> saveBlogExtra(BlogExtra blogExtra) throws ServletException {
+		if (blogExtra.getId() == null) {
+			BlogExtra found = blogExtraRepo.findByTextAndIsTag(blogExtra.getText(), blogExtra.getIsTag());
+			
+			if (found != null) {
+				return new ResponseEntity<ErrorControl>(new ErrorControl("El registro ingresado ya existe", true), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		} else {
+			BlogExtra original = blogExtraRepo.findOne(blogExtra.getId());
+			BlogExtra found = blogExtraRepo.findByTextAndTextNotAndIsTag(blogExtra.getText(), original.getText(), blogExtra.getIsTag());
+			
+			if (found != null) {
+				return new ResponseEntity<ErrorControl>(new ErrorControl("El registro ingresado ya existe", true), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
+		blogExtra = blogExtraRepo.save(blogExtra);
+		return new ResponseEntity<BlogExtra>(blogExtra, HttpStatus.OK);
 	}
 }
