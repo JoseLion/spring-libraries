@@ -40,12 +40,19 @@ public class BlogOpenController {
 	@Value("${levelap.blog.most-seen-size}")
 	private Integer mostSeenSize;
 
+	@Value("${levelap.blog.search-size}")
+	private Integer searchSize;
+
 	@Autowired
 	private BlogService blogService;
 
 	@RequestMapping(value = "findOne/{id}", method = RequestMethod.GET)
 	public ResponseEntity<BlogArticle> findOne(@PathVariable Long id) throws ServletException {
-		BlogArticle article = blogService.getBlogArticleRepo().findOne(id);
+		BlogArticle article = this.blogService.getBlogArticleRepo().findOne(id);
+		article.setNextArticleId(this.blogService.getBlogArticleRepo().findNextId(article.getId()));
+		article.setNextArticleTitle(this.blogService.getBlogArticleRepo().findArtitleTitle(article.getNextArticleId()));
+		article.setPrevArticleId(this.blogService.getBlogArticleRepo().findPrevId(article.getId()));
+		article.setPrevArticleTitle(this.blogService.getBlogArticleRepo().findArtitleTitle(article.getPrevArticleId()));
 		return new ResponseEntity<BlogArticle>(article, HttpStatus.OK);
 	}
 
@@ -96,6 +103,8 @@ public class BlogOpenController {
 			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, importantSize)), HttpStatus.OK);
 		} else if (search.isMostSeen != null && search.isMostSeen) {
 			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, mostSeenSize)), HttpStatus.OK);
+		} else if (search.isSearch != null && search.isSearch) {
+			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().searchArticles(search.text, new PageRequest(search.page, mostSeenSize)), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
@@ -109,6 +118,8 @@ public class BlogOpenController {
 		public Boolean isMostSeen;
 
 		public Boolean isSearch;
+		
+		public String text;
 
 		public Integer page = 0;
 

@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -52,6 +53,18 @@ public class BlogArticle extends BaseEntity {
 	
 	@Column(name="times_seen", columnDefinition="INTEGER DEFAULT 0")
 	private Integer timesSeen = 0;
+	
+	@Transient
+	private Long nextArticleId;
+	
+	@Transient
+	private String nextArticleTitle;
+	
+	@Transient
+	private Long prevArticleId;
+	
+	@Transient
+	private String prevArticleTitle;
 
 	public String getTitle() {
 		return title;
@@ -124,4 +137,37 @@ public class BlogArticle extends BaseEntity {
 	public void setTimesSeen(Integer timesSeen) {
 		this.timesSeen = timesSeen;
 	}
+
+	public Long getNextArticleId() {
+		return nextArticleId;
+	}
+
+	public void setNextArticleId(Long nextArticleId) {
+		this.nextArticleId = nextArticleId;
+	}
+
+	public String getNextArticleTitle() {
+		return nextArticleTitle;
+	}
+
+	public void setNextArticleTitle(String nextArticleTitle) {
+		this.nextArticleTitle = nextArticleTitle;
+	}
+
+	public Long getPrevArticleId() {
+		return prevArticleId;
+	}
+
+	public void setPrevArticleId(Long prevArticleId) {
+		this.prevArticleId = prevArticleId;
+	}
+
+	public String getPrevArticleTitle() {
+		return prevArticleTitle;
+	}
+
+	public void setPrevArticleTitle(String prevArticleTitle) {
+		this.prevArticleTitle = prevArticleTitle;
+	}
+
 }

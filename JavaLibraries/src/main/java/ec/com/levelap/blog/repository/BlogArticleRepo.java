@@ -67,4 +67,48 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 			@Param("isMostSeen") Boolean isMostSeen,
 			Pageable page);
 
+	@Query(value = "SELECT a.title FROM BlogArticle a WHERE a.id = ?1")
+	public String findArtitleTitle(Long id);
+	
+	@Query(value = "SELECT a.nextVal "
+			+ "FROM ( "
+			+ "     SELECT "
+			+ "          a2.id AS id, "
+			+ "          LEAD(a2.id) OVER (ORDER BY a2.id ASC) AS nextVal "
+			+ "     FROM blog.blog_article a2"
+			+ "     ORDER BY a2.id ASC"
+			+ ") AS a "
+			+ "WHERE a.id = ?1", nativeQuery = true)
+	public Long findNextId(Long id);
+	
+	@Query(value = "SELECT a.prevVal "
+			+ "FROM ( "
+			+ "     SELECT "
+			+ "          a2.id AS id, "
+			+ "          LAG(a2.id) OVER (ORDER BY a2.id ASC) AS prevVal "
+			+ "     FROM blog.blog_article a2"
+			+ "     ORDER BY a2.id ASC"
+			+ ") AS a "
+			+ "WHERE a.id = ?1", nativeQuery = true)
+	public Long findPrevId(Long id);
+	
+	@Query(value = "SELECT DISTINCT "
+			+ "     a.id AS id, "
+			+ "     a.title AS title, "
+			+ "     a.creationDate AS creationDate, "
+			+ "     c AS category, "
+			+ "     a.banner AS banner, "
+			+ "     a.author AS author, "
+			+ "     a.summary AS summary "
+			+ "FROM BlogArticle a "
+			+ "     LEFT JOIN a.category c "
+			+ "     LEFT JOIN a.tags t "
+			+ "WHERE "
+			+ "     a.status IS TRUE "
+			+ "     OR a.title LIKE '%' || ?1 || '%' "
+			+ "     OR c.text LIKE '%' || ?1 || '%' "
+			+ "     OR t.text LIKE '%' || ?1 || '%' "
+			+ "ORDER BY a.creationDate DESC ")
+	public Page<BlogArticleOpen> searchArticles(String text, Pageable page);
+	
 }
