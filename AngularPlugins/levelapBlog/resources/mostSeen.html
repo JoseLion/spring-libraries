@@ -13,8 +13,10 @@
                 <div class="col-md-5 picture">
                     <div class="image-section">
                         <div class="post-date"><span>{{preview.creationDate | date:'dd'}}</span><span>{{preview.creationDate | date:'MMM'}}</span></div>
+                        <div class="image-cropped">
+                            <img archive="preview.banner" ng-src="{{preview.banner.src}}" ng-style="preview.crop" />
+                        </div>
                     </div>
-                    <img archive="preview.banner" ng-src="{{preview.banner.src}}" />
                 </div>
             </article>
         </div>
