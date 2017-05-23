@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import ec.com.levelap.base.entity.BaseEntity;
@@ -35,6 +36,7 @@ public class BlogComment extends BaseEntity {
 	@JoinColumn(name="parent", foreignKey=@ForeignKey(name="parent_blog_comment"))
 	private BlogComment parent;
 	
+	@JsonIgnore
 	@ManyToMany(mappedBy="parent", fetch=FetchType.LAZY)
 	private List<BlogComment> children = new ArrayList<>();
 	

@@ -1,6 +1,5 @@
 package ec.com.levelap.blog.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -22,7 +21,6 @@ import ec.com.levelap.blog.entity.BlogArticle;
 import ec.com.levelap.blog.entity.BlogComment;
 import ec.com.levelap.blog.entity.BlogExtra;
 import ec.com.levelap.blog.service.BlogService;
-import ec.com.levelap.blog.util.BlogConst;
 
 @RestController
 @RequestMapping(value = "/open/levelapBlog", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -73,20 +71,19 @@ public class BlogOpenController {
 		if (page == null) {
 			page = 0;
 		}
-
-		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateDesc(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
-
-		for (BlogComment comment : comments.getContent()) {
-			comment.setChildren(new ArrayList<>());
-		}
-
+		
+		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateAsc(articleId, new PageRequest(page, commentPageSize));
 		return new ResponseEntity<Page<BlogComment>>(comments, HttpStatus.OK);
 	}
-
-	@RequestMapping(value = "getRepliesOf/{parentId}", method = RequestMethod.GET)
-	public ResponseEntity<List<BlogComment>> getRepliesOf(@PathVariable Long parentId) throws ServletException {
-		List<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateDesc(parentId);
-		return new ResponseEntity<List<BlogComment>>(replies, HttpStatus.OK);
+	
+	@RequestMapping(value="getRepliesOf/{parentId}/{page}", method=RequestMethod.GET)
+	public ResponseEntity<Page<BlogComment>> getRepliesOf(@PathVariable Long parentId, @PathVariable(required=false) Integer page) throws ServletException {
+		if (page == null) {
+			page = 0;
+		}
+		
+		Page<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateAsc(parentId, new PageRequest(page, commentPageSize));
+		return new ResponseEntity<Page<BlogComment>>(replies, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "saveComment", method = RequestMethod.POST)
