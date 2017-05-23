@@ -25,32 +25,49 @@ import ec.com.levelap.blog.service.BlogService;
 @RestController
 @RequestMapping(value = "/open/levelapBlog", produces = MediaType.APPLICATION_JSON_VALUE)
 public class BlogOpenController {
+
 	@Value("${levelap.blog.comment-page-size}")
 	private Integer commentPageSize;
-	
+
+	@Value("${levelap.blog.home-page-size}")
+	private Integer homePageSize;
+
+	@Value("${levelap.blog.important-size}")
+	private Integer importantSize;
+
+	@Value("${levelap.blog.most-seen-size}")
+	private Integer mostSeenSize;
+
+	@Value("${levelap.blog.search-size}")
+	private Integer searchSize;
+
 	@Autowired
 	private BlogService blogService;
-	
-	@RequestMapping(value="findOne/{id}", method=RequestMethod.GET)
+
+	@RequestMapping(value = "findOne/{id}", method = RequestMethod.GET)
 	public ResponseEntity<BlogArticle> findOne(@PathVariable Long id) throws ServletException {
-		BlogArticle article = blogService.getBlogArticleRepo().findOne(id);
+		BlogArticle article = this.blogService.getBlogArticleRepo().findOne(id);
+		article.setNextArticleId(this.blogService.getBlogArticleRepo().findNextId(article.getId()));
+		article.setNextArticleTitle(this.blogService.getBlogArticleRepo().findArtitleTitle(article.getNextArticleId()));
+		article.setPrevArticleId(this.blogService.getBlogArticleRepo().findPrevId(article.getId()));
+		article.setPrevArticleTitle(this.blogService.getBlogArticleRepo().findArtitleTitle(article.getPrevArticleId()));
 		return new ResponseEntity<BlogArticle>(article, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value="getCategories", method=RequestMethod.GET)
+
+	@RequestMapping(value = "getCategories", method = RequestMethod.GET)
 	public ResponseEntity<List<BlogExtra>> getCategories() throws ServletException {
 		List<BlogExtra> categories = blogService.getBlogExtraRepo().findByStatusIsTrueAndIsTag(false);
 		return new ResponseEntity<List<BlogExtra>>(categories, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value="getTags", method=RequestMethod.GET)
+
+	@RequestMapping(value = "getTags", method = RequestMethod.GET)
 	public ResponseEntity<List<BlogExtra>> getTags() throws ServletException {
 		List<BlogExtra> tags = blogService.getBlogExtraRepo().findByStatusIsTrueAndIsTag(true);
 		return new ResponseEntity<List<BlogExtra>>(tags, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value="getCommentsOf/{articleId}/{page}")
-	public ResponseEntity<Page<BlogComment>> getCommentsOf(@PathVariable Long articleId, @PathVariable(required=false) Integer page) throws ServletException {
+
+	@RequestMapping(value = "getCommentsOf/{articleId}/{page}")
+	public ResponseEntity<Page<BlogComment>> getCommentsOf(@PathVariable Long articleId, @PathVariable(required = false) Integer page) throws ServletException {
 		if (page == null) {
 			page = 0;
 		}
@@ -68,10 +85,41 @@ public class BlogOpenController {
 		Page<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateAsc(parentId, new PageRequest(page, commentPageSize));
 		return new ResponseEntity<Page<BlogComment>>(replies, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value="saveComment", method=RequestMethod.POST)
+
+	@RequestMapping(value = "saveComment", method = RequestMethod.POST)
 	public ResponseEntity<BlogComment> saveComment(@RequestBody BlogComment comment) throws ServletException {
 		comment = blogService.saveComment(comment);
 		return new ResponseEntity<BlogComment>(comment, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "findArticles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> findArticles(@RequestBody Search search) throws ServletException {
+		if (search.isHomePage != null && search.isHomePage) {
+			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, homePageSize)), HttpStatus.OK);
+		} else if (search.isFeatured != null && search.isFeatured) {
+			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, importantSize)), HttpStatus.OK);
+		} else if (search.isMostSeen != null && search.isMostSeen) {
+			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, mostSeenSize)), HttpStatus.OK);
+		} else if (search.isSearch != null && search.isSearch) {
+			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().searchArticles(search.text, new PageRequest(search.page, searchSize)), HttpStatus.OK);
+		}
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+
+	private static class Search {
+
+		public Boolean isHomePage;
+
+		public Boolean isFeatured;
+
+		public Boolean isMostSeen;
+
+		public Boolean isSearch;
+		
+		public String text;
+
+		public Integer page = 0;
+
+	}
+
 }
