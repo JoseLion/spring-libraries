@@ -217,7 +217,7 @@ angular.module("LevelapBlogAdmin", []).config(function($stateProvider) {
 	config: {
 		hasCategories: true,
 		hasTags: true,
-		recursiveComments: false
+		recursiveComments: true
 	},
 
 	tableSize: 20

@@ -22,15 +22,16 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 				"a.title AS title, " +
 				"a.status AS status, " +
 				"a.creationDate AS creationDate, " +
-				"a.category AS category, " +
+				"c AS category, " +
 				"a.isFeatured AS isFeatured " +
 			"FROM BlogArticle a " +
+				"LEFT JOIN a.category c " +
 				"LEFT JOIN a.tags t " +
 			"WHERE " +
 				"UPPER(a.title) LIKE UPPER('%' || :title || '%') AND " +
 				"(:status IS NULL OR a.status=:status) AND " +
 				"DATE(a.creationDate) BETWEEN DATE(:startDate) AND DATE(:endDate) AND " +
-				"(:category IS NULL OR a.category=:category) AND " +
+				"(:category IS NULL OR c=:category) AND " +
 				"(:isTagsEmpty=TRUE OR t IN :tags) AND " +
 				"(:isFeatured IS NULL OR a.isFeatured=:isFeatured) " +
 			"ORDER BY a.creationDate DESC")
