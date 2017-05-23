@@ -107,7 +107,7 @@ public class BlogController {
 			page = 0;
 		}
 		
-		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateDesc(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
+		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateAsc(articleId, new PageRequest(page, BlogConst.TABLE_SIZE));
 		return new ResponseEntity<Page<BlogComment>>(comments, HttpStatus.OK);
 	}
 	
@@ -117,7 +117,7 @@ public class BlogController {
 			page = 0;
 		}
 		
-		Page<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateDesc(parentId, new PageRequest(page, BlogConst.TABLE_SIZE));
+		Page<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateAsc(parentId, new PageRequest(page, BlogConst.TABLE_SIZE));
 		return new ResponseEntity<Page<BlogComment>>(replies, HttpStatus.OK);
 	}
 	
