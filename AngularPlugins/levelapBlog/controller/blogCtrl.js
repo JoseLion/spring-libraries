@@ -39,7 +39,7 @@ angular.module('LevelapBlog').controller('BlogCtrl', function($scope, $rootScope
         $scope.blogsPreview = data.content;
         $scope.blogsPreview.forEach(function(preview) {
             preview.crop = {
-                width: '460px',
+                width: '330px',
                 transform: 'translate(-80px,0)'
             };
         });
