@@ -56,7 +56,7 @@
         <div class="tags-section" ng-if="tags.length > 0">
             <h2>Tags</h2>
             <hr class="subtitle" />
-            <div class="tag" ng-repeat="tag in tags"><span>{{tag.text}}</span></div>
+            <div class="tag" ng-repeat="tag in tags" ui-sref="levelapBlog.blog.search({text:tag.text})"><span>{{tag.text}}</span></div>
         </div>
 
         <!-- HERE TO PUT EXTRA INFORMATION -->
