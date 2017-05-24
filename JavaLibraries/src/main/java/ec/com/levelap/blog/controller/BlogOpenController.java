@@ -1,5 +1,6 @@
 package ec.com.levelap.blog.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.com.levelap.blog.entity.BlogArticle;
+import ec.com.levelap.blog.entity.BlogArticleOpen;
 import ec.com.levelap.blog.entity.BlogComment;
 import ec.com.levelap.blog.entity.BlogExtra;
 import ec.com.levelap.blog.service.BlogService;
@@ -71,17 +73,17 @@ public class BlogOpenController {
 		if (page == null) {
 			page = 0;
 		}
-		
+
 		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateAsc(articleId, new PageRequest(page, commentPageSize));
 		return new ResponseEntity<Page<BlogComment>>(comments, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value="getRepliesOf/{parentId}/{page}", method=RequestMethod.GET)
-	public ResponseEntity<Page<BlogComment>> getRepliesOf(@PathVariable Long parentId, @PathVariable(required=false) Integer page) throws ServletException {
+
+	@RequestMapping(value = "getRepliesOf/{parentId}/{page}", method = RequestMethod.GET)
+	public ResponseEntity<Page<BlogComment>> getRepliesOf(@PathVariable Long parentId, @PathVariable(required = false) Integer page) throws ServletException {
 		if (page == null) {
 			page = 0;
 		}
-		
+
 		Page<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateAsc(parentId, new PageRequest(page, commentPageSize));
 		return new ResponseEntity<Page<BlogComment>>(replies, HttpStatus.OK);
 	}
@@ -95,15 +97,28 @@ public class BlogOpenController {
 	@RequestMapping(value = "findArticles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> findArticles(@RequestBody Search search) throws ServletException {
 		if (search.isHomePage != null && search.isHomePage) {
-			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, homePageSize)), HttpStatus.OK);
+			Page<BlogArticleOpen> articles = this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, homePageSize));
+			return new ResponseEntity<>(this.setTagsOnOpen(articles), HttpStatus.OK);
 		} else if (search.isFeatured != null && search.isFeatured) {
 			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, importantSize)), HttpStatus.OK);
 		} else if (search.isMostSeen != null && search.isMostSeen) {
 			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, mostSeenSize)), HttpStatus.OK);
 		} else if (search.isSearch != null && search.isSearch) {
-			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().searchArticles(search.text, new PageRequest(search.page, searchSize)), HttpStatus.OK);
+			Page<BlogArticleOpen> articles = this.blogService.getBlogArticleRepo().searchArticles(search.text, new PageRequest(search.page, searchSize));
+			return new ResponseEntity<>(this.setTagsOnOpen(articles), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+	
+	private Page<BlogArticleOpen> setTagsOnOpen(Page<BlogArticleOpen> articles) {
+		articles.getContent().forEach(article -> {
+			List<BlogExtra> extras = new ArrayList<>();
+			this.blogService.getBlogTagRepo().findByBlogArticleId(article.getId()).forEach(tag -> {
+				extras.add(tag.getBlogExtra());
+			});
+			article.setTags(extras);
+		});
+		return articles;
 	}
 
 	private static class Search {
@@ -115,7 +130,7 @@ public class BlogOpenController {
 		public Boolean isMostSeen;
 
 		public Boolean isSearch;
-		
+
 		public String text;
 
 		public Integer page = 0;

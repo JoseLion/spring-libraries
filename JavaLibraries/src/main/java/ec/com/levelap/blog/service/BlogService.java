@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import ec.com.levelap.blog.repository.BlogCommentRepo;
 import ec.com.levelap.blog.repository.BlogExtraRepo;
+import ec.com.levelap.blog.repository.BlogTagRepo;
 import ec.com.levelap.commons.archive.Archive;
 import ec.com.levelap.commons.service.DocumentService;
 import ec.com.levelap.base.entity.ErrorControl;
@@ -34,6 +35,9 @@ public class BlogService {
 	private BlogExtraRepo blogExtraRepo;
 	
 	@Autowired
+	private BlogTagRepo blogTagRepo;
+	
+	@Autowired
 	public DocumentService documentService;
 
 	public BlogArticleRepo getBlogArticleRepo() {
@@ -46,6 +50,10 @@ public class BlogService {
 	
 	public BlogExtraRepo getBlogExtraRepo() {
 		return blogExtraRepo;
+	}
+	
+	public BlogTagRepo getBlogTagRepo() {
+		return blogTagRepo;
 	}
 
 	@Transactional
