@@ -40,11 +40,11 @@ public class BlogArticle extends BaseEntity {
 	@Column(columnDefinition="VARCHAR")
 	private String author;
 	
-	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL, optional = true)
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.DETACH, optional=true)
 	@JoinColumn(name="category", foreignKey=@ForeignKey(name="category_blog_extra_fk"))
 	private BlogExtra category;
 	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.DETACH)
 	@JoinTable(name="blog_tag", schema="blog", joinColumns=@JoinColumn(name="blog_article", foreignKey=@ForeignKey(name="blog_article_fk")), inverseJoinColumns=@JoinColumn(name="blog_extra", foreignKey=@ForeignKey(name="blog_extra_fk")))
 	private List<BlogExtra> tags = new ArrayList<>();
 	

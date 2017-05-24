@@ -67,6 +67,20 @@ public class BlogService {
 			article.setBanner(archive);
 		}
 		
+		if (article.getCategory() != null) {
+			if (article.getCategory().getId() == null) {
+				article.setCategory(blogExtraRepo.saveAndFlush(article.getCategory()));
+			}
+		}
+		
+		if (article.getTags() != null && article.getTags().size() > 0) {
+			for (BlogExtra extra : article.getTags()) {
+				if (extra.getId() == null) {
+					extra = blogExtraRepo.saveAndFlush(extra);
+				}
+			}
+		}
+		
 		blogArticleRepo.save(article);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
