@@ -74,7 +74,7 @@ public class BlogOpenController {
 			page = 0;
 		}
 
-		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateAsc(articleId, new PageRequest(page, commentPageSize));
+		Page<BlogComment> comments = blogService.getBlogCommentRepo().findByParentIsNullAndBlogArticleIdOrderByCreationDateDesc(articleId, new PageRequest(page, commentPageSize));
 		return new ResponseEntity<Page<BlogComment>>(comments, HttpStatus.OK);
 	}
 
@@ -84,7 +84,7 @@ public class BlogOpenController {
 			page = 0;
 		}
 
-		Page<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateAsc(parentId, new PageRequest(page, commentPageSize));
+		Page<BlogComment> replies = blogService.getBlogCommentRepo().findByParent_IdOrderByCreationDateDesc(parentId, new PageRequest(page, commentPageSize));
 		return new ResponseEntity<Page<BlogComment>>(replies, HttpStatus.OK);
 	}
 
