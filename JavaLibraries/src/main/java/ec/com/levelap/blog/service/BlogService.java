@@ -11,17 +11,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import ec.com.levelap.blog.repository.BlogCommentRepo;
-import ec.com.levelap.blog.repository.BlogExtraRepo;
-import ec.com.levelap.blog.repository.BlogTagRepo;
-import ec.com.levelap.commons.archive.Archive;
-import ec.com.levelap.commons.service.DocumentService;
 import ec.com.levelap.base.entity.ErrorControl;
 import ec.com.levelap.base.entity.FileData;
 import ec.com.levelap.blog.entity.BlogArticle;
 import ec.com.levelap.blog.entity.BlogComment;
 import ec.com.levelap.blog.entity.BlogExtra;
 import ec.com.levelap.blog.repository.BlogArticleRepo;
+import ec.com.levelap.blog.repository.BlogCommentRepo;
+import ec.com.levelap.blog.repository.BlogExtraRepo;
+import ec.com.levelap.blog.repository.BlogTagRepo;
+import ec.com.levelap.commons.archive.Archive;
+import ec.com.levelap.commons.service.DocumentService;
 
 @Service
 public class BlogService {
@@ -73,6 +73,20 @@ public class BlogService {
 			archive.setName(fileData.getName());
 			archive.setType(banner.getContentType());
 			article.setBanner(archive);
+		}
+		
+		if (article.getCategory() != null) {
+			if (article.getCategory().getId() == null) {
+				article.setCategory(blogExtraRepo.saveAndFlush(article.getCategory()));
+			}
+		}
+		
+		if (article.getTags() != null && article.getTags().size() > 0) {
+			for (BlogExtra extra : article.getTags()) {
+				if (extra.getId() == null) {
+					extra = blogExtraRepo.saveAndFlush(extra);
+				}
+			}
 		}
 		
 		blogArticleRepo.save(article);
