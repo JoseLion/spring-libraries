@@ -15,6 +15,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.postgresql.geometric.PGline;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import ec.com.levelap.base.entity.BaseEntity;
@@ -53,6 +55,12 @@ public class BlogArticle extends BaseEntity {
 	
 	@Column(name="times_seen", columnDefinition="INTEGER DEFAULT 0")
 	private Integer timesSeen = 0;
+	
+	@Column(name="diamond_crop")
+	private PGline diamondCrop;
+	
+	@Column(name="square_crop")
+	private PGline squareCrop;
 	
 	@Transient
 	private Long nextArticleId;
@@ -136,6 +144,22 @@ public class BlogArticle extends BaseEntity {
 
 	public void setTimesSeen(Integer timesSeen) {
 		this.timesSeen = timesSeen;
+	}
+
+	public PGline getDiamondCrop() {
+		return diamondCrop;
+	}
+
+	public void setDiamondCrop(PGline diamondCrop) {
+		this.diamondCrop = diamondCrop;
+	}
+
+	public PGline getSquareCrop() {
+		return squareCrop;
+	}
+
+	public void setSquareCrop(PGline squareCrop) {
+		this.squareCrop = squareCrop;
 	}
 
 	public Long getNextArticleId() {
