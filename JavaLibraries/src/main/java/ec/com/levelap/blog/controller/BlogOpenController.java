@@ -104,6 +104,9 @@ public class BlogOpenController {
 		} else if (search.isMostSeen != null && search.isMostSeen) {
 			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, mostSeenSize)), HttpStatus.OK);
 		} else if (search.isSearch != null && search.isSearch) {
+			if(search.text == null) {
+				search.text = "";
+			}
 			Page<BlogArticleOpen> articles = this.blogService.getBlogArticleRepo().searchArticles(search.text, new PageRequest(search.page, searchSize));
 			return new ResponseEntity<>(this.setTagsOnOpen(articles), HttpStatus.OK);
 		}
