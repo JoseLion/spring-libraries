@@ -38,7 +38,6 @@ angular.module("LevelapBlogAdmin").controller('ManageArticleCtrl', function($sco
 
 	$scope.getCropStyle = function() {
 		let diamondDiv = angular.element("#diamond-div");
-		console.log("diamondDiv: ", diamondDiv[0].clientWidth);
 		return {
 			height: diamondDiv[0].clientWidth + 'px'
 		};
