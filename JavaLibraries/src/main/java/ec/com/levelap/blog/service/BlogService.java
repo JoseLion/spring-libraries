@@ -57,7 +57,7 @@ public class BlogService {
 	}
 
 	@Transactional
-	public ResponseEntity<?> saveArticle(BlogArticle article, MultipartFile banner) throws ServletException, IOException {
+	public ResponseEntity<?> saveArticle(BlogArticle article, MultipartFile banner, MultipartFile diamond, MultipartFile square) throws ServletException, IOException {
 		if (banner != null) {
 			Archive archive = new Archive();
 			
@@ -73,6 +73,46 @@ public class BlogService {
 			archive.setName(fileData.getName());
 			archive.setType(banner.getContentType());
 			article.setBanner(archive);
+		}
+		
+		if (diamond != null) {
+			Archive archive = new Archive();
+			
+			if (article.getId() != null) {
+				BlogArticle original = blogArticleRepo.findOne(article.getId());
+				
+				if (original.getDiamond() != null) {
+					documentService.deleteFile(original.getDiamond().getName(), BlogArticle.class.getSimpleName());
+					archive = original.getDiamond();
+				}
+			}
+			
+			FileData fileData = documentService.saveFile(diamond, BlogArticle.class.getSimpleName());
+			
+			archive.setModule(BlogArticle.class.getSimpleName());
+			archive.setName(fileData.getName());
+			archive.setType(diamond.getContentType());
+			article.setDiamond(archive);
+		}
+		
+		if (square != null) {
+			Archive archive = new Archive();
+			
+			if (article.getId() != null) {
+				BlogArticle original = blogArticleRepo.findOne(article.getId());
+				
+				if (original.getSquare() != null) {
+					documentService.deleteFile(original.getSquare().getName(), BlogArticle.class.getSimpleName());
+					archive = original.getSquare();
+				}
+			}
+			
+			FileData fileData = documentService.saveFile(square, BlogArticle.class.getSimpleName());
+			
+			archive.setModule(BlogArticle.class.getSimpleName());
+			archive.setName(fileData.getName());
+			archive.setType(square.getContentType());
+			article.setSquare(archive);
 		}
 		
 		if (article.getCategory() != null) {
