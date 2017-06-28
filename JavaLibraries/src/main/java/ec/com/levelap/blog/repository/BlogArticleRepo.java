@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import ec.com.levelap.blog.entity.BlogArticle;
 import ec.com.levelap.blog.entity.BlogArticleLite;
+import ec.com.levelap.blog.entity.BlogArticleMetaTags;
 import ec.com.levelap.blog.entity.BlogArticleOpen;
 import ec.com.levelap.blog.entity.BlogExtra;
 
@@ -120,4 +121,5 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 			+ "ORDER BY a.creationDate DESC ")
 	public Page<BlogArticleOpen> searchArticles(String text, Pageable page);
 	
+	public BlogArticleMetaTags findOneById(Long id);
 }
