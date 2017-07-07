@@ -36,6 +36,7 @@ repositories {
 configurations {
 	providedRuntime
 	jaxb
+	ws
 }
 
 dependencies {
@@ -53,24 +54,21 @@ dependencies {
 	compile("org.springframework.ws:spring-ws-core")
 	jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
 	
+	ws "org.apache.cxf:cxf-tools:2.5.1",
+		"org.apache.cxf:cxf-tools-wsdlto-databinding-jaxb:2.5.1",
+		"org.apache.cxf:cxf-tools-wsdlto-frontend-jaxws:2.5.1",
+		"log4j:log4j:1.2.17"
+	
+	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
-ext.wsldMethod = { type ->
-	ext.sourcesDir = "src/main/java/ec/com/levelap/tcc/entity/" + type
-	ext.schema = "http://clientes.tcc.com.co/servicios/" + type + ".asmx?WSDL"
-	
-	project.ant {
-		taskdef name: "xjc", classname: "com.sun.tools.xjc.XJCTask", classpath: configurations.jaxb.asPath
-		delete(dir: sourcesDir)
-		mkdir(dir: sourcesDir)
-		
-		xjc(destdir: sourcesDir, schema: schema, package: "ec.com.levelap.tcc.entity." + type) {
-			arg(value: "-wsdl")
-			produces(dir: sourcesDir, includes: "**/*.java")
-		}
-		
-		move(file: sourcesDir + "/ec/com/levelap/tcc/entity/" + type, tofile: sourcesDir)
+ext.wsldMethod = { webService ->
+	javaexec {
+		classpath configurations.ws
+		main = 'org.apache.cxf.tools.wsdlto.WSDLToJava'
+		args = ['-d', 'src/main/java', '-p', 'ec.com.levelap.tcc.entity.' + webService, '-autoNameResolution', 'http://clientes.tcc.com.co/servicios/' + webService + '.asmx?WSDL']
+		systemProperties = ['exitOnFinish':'TRUE']
 	}
 }
 

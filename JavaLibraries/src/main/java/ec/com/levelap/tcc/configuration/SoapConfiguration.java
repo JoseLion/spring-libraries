@@ -11,9 +11,7 @@ public class SoapConfiguration {
 	@Bean
 	public Jaxb2Marshaller marshaller() {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-		//marshaller.setPackagesToScan("ec.com.levelap.tcc.entity");
 		marshaller.setContextPaths("ec.com.levelap.tcc.entity.wsrecogidas");
-		//marshaller.setContextPath("ec.com.levelap.tcc.entity");
 		
 		return marshaller;
 	}
@@ -21,7 +19,6 @@ public class SoapConfiguration {
 	@Bean
 	public TccService tccService(Jaxb2Marshaller marshaller) {
 		TccService service = new TccService();
-		service.setDefaultUri("http://clientes.tcc.com.co/testservicios/wsrecogidas.asmx");
 		service.setMarshaller(marshaller);
 		service.setUnmarshaller(marshaller);
 		
