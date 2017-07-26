@@ -29,7 +29,7 @@ public class Mail {
 			message.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
 		}
 		message.setSubject(param.getSubject());
-		message.setContent(param.getContent(), "text/html");
+		message.setContent(param.getContent(), "text/html; charset=UTF-8");
 		mailSender.send(message);
 	}
 

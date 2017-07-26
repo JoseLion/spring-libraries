@@ -72,5 +72,4 @@ ext.wsldMethod = { webService ->
 	}
 }
 
-project.wsldMethod("wsrecogidas")
 project.wsldMethod("wsDespachos")
