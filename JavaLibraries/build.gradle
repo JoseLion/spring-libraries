@@ -67,9 +67,10 @@ ext.wsldMethod = { webService ->
 	javaexec {
 		classpath configurations.ws
 		main = 'org.apache.cxf.tools.wsdlto.WSDLToJava'
-		args = ['-d', 'src/main/java', '-p', 'ec.com.levelap.tcc.entity.' + webService, '-autoNameResolution', 'http://clientes.tcc.com.co/servicios/' + webService + '.asmx?WSDL']
+		args = ['-d', 'src/main/java', '-p', 'http://clientes.tcc.com.co/=ec.com.levelap.tcc.wsdl.clientes', '-p', 'http://www.tcc.com.co/xsd=ec.com.levelap.tcc.wsdl.xsd', 'http://clientes.tcc.com.co/servicios/' + webService + '.asmx?WSDL']
 		systemProperties = ['exitOnFinish':'TRUE']
 	}
 }
 
 project.wsldMethod("wsDespachos")
+project.wsldMethod("InformacionRemesas")

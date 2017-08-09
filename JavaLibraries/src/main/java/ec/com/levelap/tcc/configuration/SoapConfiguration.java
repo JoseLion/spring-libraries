@@ -11,7 +11,7 @@ public class SoapConfiguration {
 	@Bean
 	public Jaxb2Marshaller marshaller() {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-		marshaller.setContextPaths("ec.com.levelap.tcc.entity.wsrecogidas");
+		marshaller.setPackagesToScan("ec.com.levelap.tcc.wsdl");
 		
 		return marshaller;
 	}
