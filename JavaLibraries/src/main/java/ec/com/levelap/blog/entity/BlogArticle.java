@@ -27,6 +27,9 @@ public class BlogArticle extends BaseEntity {
 	@Column(columnDefinition="VARCHAR", nullable=false)
 	private String title;
 	
+	@Column(columnDefinition="VARCHAR")
+	private String keywords;
+	
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinColumn(name="banner", foreignKey=@ForeignKey(name="banner_archive_fk"))
 	private Archive banner;
@@ -76,6 +79,14 @@ public class BlogArticle extends BaseEntity {
 
 	public String getTitle() {
 		return title;
+	}
+
+	public String getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
 	}
 
 	public void setTitle(String title) {
