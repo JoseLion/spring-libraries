@@ -1,42 +1,56 @@
-package ec.com.levelap.base.entity;
+package ec.com.levelap.mail.entity;
 
 import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import ec.com.levelap.base.LevelapBase;
 import ec.com.levelap.base.LevelapBaseContextHolder;
 
-@MappedSuperclass
-public class BaseEntity {
-
+@Entity
+@Table(schema="commons", name="mail_template", uniqueConstraints={@UniqueConstraint(columnNames={"code"}, name="code_uk")})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class MailTemplate {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
-	@Column(name = "id", nullable = false)
+	@Column(name="id", nullable=false)
 	protected Long id;
 
-	@Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+	@Column(nullable=false, columnDefinition="BOOLEAN DEFAULT TRUE")
 	protected Boolean status = true;
 
-	@Column(name = "creation_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Column(name="creation_date", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	protected Date creationDate = new Date();
 
-	@Column(name = "creation_user", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+	@Column(name="creation_user", nullable=false, columnDefinition="BIGINT DEFAULT 0")
 	protected Long creationUser = 0L;
 
-	@Column(name = "update_date")
+	@Column(name="update_date")
 	protected Date updateDate;
 
-	@Column(name = "update_user")
+	@Column(name="update_user")
 	protected Long updateUser;
+	
+	@Column(nullable=false, columnDefinition="VARCHAR")
+	private String code;
+	
+	@Column(nullable=false, columnDefinition="VARCHAR")
+	private String subject;
+	
+	@Column(nullable=false, columnDefinition="VARCHAR")
+	private String content;
 
 	public Long getId() {
 		return id;
@@ -86,6 +100,30 @@ public class BaseEntity {
 		this.updateUser = updateUser;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
@@ -106,5 +144,4 @@ public class BaseEntity {
 			this.setUpdateUser(-1L);
 		}
 	}
-
 }
