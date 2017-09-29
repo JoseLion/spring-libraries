@@ -1,4 +1,4 @@
-package ec.com.levelap.base.entity;
+package ec.com.levelap.document.entity;
 
 import java.util.Date;
 
@@ -16,26 +16,25 @@ import ec.com.levelap.base.LevelapBaseContextHolder;
 
 @MappedSuperclass
 public class BaseEntity {
-
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Basic(optional = false)
-	@Column(name = "id", nullable = false)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Basic(optional=false)
+	@Column(name="id", nullable=false)
 	protected Long id;
 
-	@Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+	@Column(nullable=false, columnDefinition="BOOLEAN DEFAULT TRUE")
 	protected Boolean status = true;
 
-	@Column(name = "creation_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Column(name="creation_date", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	protected Date creationDate = new Date();
 
-	@Column(name = "creation_user", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+	@Column(name="creation_user", nullable=false, columnDefinition="BIGINT DEFAULT 0")
 	protected Long creationUser = 0L;
 
-	@Column(name = "update_date")
+	@Column(name="update_date")
 	protected Date updateDate;
 
-	@Column(name = "update_user")
+	@Column(name="update_user")
 	protected Long updateUser;
 
 	public Long getId() {
@@ -107,5 +106,4 @@ public class BaseEntity {
 			this.setUpdateUser(-1L);
 		}
 	}
-
 }
