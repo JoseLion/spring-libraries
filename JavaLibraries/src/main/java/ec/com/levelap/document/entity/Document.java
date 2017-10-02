@@ -13,16 +13,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.TypeDef;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
+@TypeDef(name="HStore", typeClass=HStoreUserType.class)
 @Table(schema="commons", name="document", uniqueConstraints={@UniqueConstraint(columnNames={"code"}, name="code_uk")})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Document extends BaseEntity {
 	@Column(columnDefinition="VARCHAR", nullable=false)
 	private String name;
 	
-	@Column(columnDefinition="VARCHAR", nullable=false)
+	@Column(columnDefinition="VARCHAR")
 	private String code;
 	
 	@Column(columnDefinition="VARCHAR", nullable=false)
@@ -31,8 +34,11 @@ public class Document extends BaseEntity {
 	@Column(columnDefinition="VARCHAR", nullable=false)
 	private String route;
 	
-	@Column(name="meta_data", columnDefinition="hstore")
+	@Column(name="meta_data", columnDefinition="HStore")
 	private Map<String, String> metaData = new HashMap<>();
+	
+	@Column(name="content_manager_id", columnDefinition="VARCHAR")
+	private String contentManagerId;
 	
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.DETACH)
 	@JoinColumn(name="type", foreignKey=@ForeignKey(name="document_type_fk"))
@@ -76,6 +82,14 @@ public class Document extends BaseEntity {
 
 	public void setMetaData(Map<String, String> metaData) {
 		this.metaData = metaData;
+	}
+
+	public String getContentManagerId() {
+		return contentManagerId;
+	}
+
+	public void setContentManagerId(String contentManagerId) {
+		this.contentManagerId = contentManagerId;
 	}
 
 	public DocumentType getType() {

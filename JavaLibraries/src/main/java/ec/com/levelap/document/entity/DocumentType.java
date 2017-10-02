@@ -1,7 +1,12 @@
 package ec.com.levelap.document.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -28,6 +33,10 @@ public class DocumentType extends BaseEntity {
 	
 	@Column(name="group_code", columnDefinition="VARCHAR", nullable=false)
 	private String groupCode;
+	
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.DETACH)
+	@JoinColumn(name="category", foreignKey=@ForeignKey(name="document_category_fk"))
+	private DocumentCategory category;
 
 	public String getName() {
 		return name;
@@ -75,5 +84,13 @@ public class DocumentType extends BaseEntity {
 
 	public void setGroupCode(String groupCode) {
 		this.groupCode = groupCode;
+	}
+
+	public DocumentCategory getCategory() {
+		return category;
+	}
+
+	public void setCategory(DocumentCategory category) {
+		this.category = category;
 	}
 }
