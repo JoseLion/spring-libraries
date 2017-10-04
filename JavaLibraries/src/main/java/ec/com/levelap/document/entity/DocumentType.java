@@ -1,5 +1,7 @@
 package ec.com.levelap.document.entity;
 
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,9 +12,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
+@TypeDef(name="PgArray", typeClass=PgArrayUserType.class)
 @Table(schema="commons", name="document_type", uniqueConstraints={@UniqueConstraint(columnNames={"code"}, name="code_uk")})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DocumentType extends BaseEntity {
@@ -25,8 +31,9 @@ public class DocumentType extends BaseEntity {
 	@Column(columnDefinition="VARCHAR", nullable=false)
 	private String root;
 	
+	@Type(type="PgArray")
 	@Column(name="meta_keys", columnDefinition="text[]", nullable=false)
-	private String[] metaKeys;
+	private List<String> metaKeys;
 	
 	@Column(columnDefinition="INTEGER DEFAULT -1", nullable=false)
 	private Integer quantity = -1;
@@ -62,11 +69,11 @@ public class DocumentType extends BaseEntity {
 		this.root = root;
 	}
 
-	public String[] getMetaKeys() {
+	public List<String> getMetaKeys() {
 		return metaKeys;
 	}
 
-	public void setMetaKeys(String[] metaKeys) {
+	public void setMetaKeys(List<String> metaKeys) {
 		this.metaKeys = metaKeys;
 	}
 

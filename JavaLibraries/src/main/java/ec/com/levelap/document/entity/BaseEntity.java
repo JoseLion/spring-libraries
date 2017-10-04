@@ -11,8 +11,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
-import ec.com.levelap.base.LevelapBase;
-import ec.com.levelap.base.LevelapBaseContextHolder;
+import ec.com.levelap.document.LevelapContextHolder;
+import ec.com.levelap.document.LevelapDocument;
 
 @MappedSuperclass
 public class BaseEntity {
@@ -88,8 +88,8 @@ public class BaseEntity {
 	@PrePersist
 	protected void onCreate() {
 		try {
-			LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
-			this.setCreationUser(levelap.getConfig().getCurrentUser());
+			LevelapDocument levelapDocument = LevelapContextHolder.getContext().getBean(LevelapDocument.class);
+			this.setCreationUser(levelapDocument.getDocumentConfig().currentUserId());
 		} catch (Exception ex) {
 			this.setCreationUser(-1L);
 		}
@@ -100,8 +100,8 @@ public class BaseEntity {
 		this.setUpdateDate(new Date());
 		
 		try {
-			LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
-			this.setUpdateUser(levelap.getConfig().getCurrentUser());
+			LevelapDocument levelapDocument = LevelapContextHolder.getContext().getBean(LevelapDocument.class);
+			this.setUpdateUser(levelapDocument.getDocumentConfig().currentUserId());
 		} catch (Exception ex) {
 			this.setUpdateUser(-1L);
 		}

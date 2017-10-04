@@ -11,4 +11,6 @@ public interface DocumentConfig {
 	public String storeInContentManager(MultipartFile file, Map<String, String> metaData);
 	
 	public File retrieveFromContentManager(String id);
+	
+	public Long currentUserId();
 }

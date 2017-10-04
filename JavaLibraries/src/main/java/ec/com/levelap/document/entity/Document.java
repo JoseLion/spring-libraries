@@ -11,8 +11,10 @@ import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,13 +30,14 @@ public class Document extends BaseEntity {
 	@Column(columnDefinition="VARCHAR")
 	private String code;
 	
-	@Column(columnDefinition="VARCHAR", nullable=false)
+	@Column(name="mime_type", columnDefinition="VARCHAR", nullable=false)
 	private String mimeType;
 	
 	@Column(columnDefinition="VARCHAR", nullable=false)
 	private String route;
 	
-	@Column(name="meta_data", columnDefinition="HStore")
+	@Type(type="HStore")
+	@Column(name="meta_data", columnDefinition="HSTORE")
 	private Map<String, String> metaData = new HashMap<>();
 	
 	@Column(name="content_manager_id", columnDefinition="VARCHAR")
@@ -43,6 +46,9 @@ public class Document extends BaseEntity {
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.DETACH)
 	@JoinColumn(name="type", foreignKey=@ForeignKey(name="document_type_fk"))
 	private DocumentType type;
+	
+	@Transient
+	private String restUrl;
 
 	public String getName() {
 		return name;
@@ -98,5 +104,14 @@ public class Document extends BaseEntity {
 
 	public void setType(DocumentType type) {
 		this.type = type;
+	}
+
+	public String getRestUrl() {
+		restUrl = "/open/document/download/" + id;
+		return restUrl;
+	}
+
+	public void setRestUrl(String restUrl) {
+		this.restUrl = restUrl;
 	}
 }
