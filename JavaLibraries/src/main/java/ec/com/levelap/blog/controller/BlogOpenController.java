@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.com.levelap.blog.entity.BlogArticle;
+import ec.com.levelap.blog.entity.BlogArticleMetaTags;
 import ec.com.levelap.blog.entity.BlogArticleOpen;
 import ec.com.levelap.blog.entity.BlogComment;
 import ec.com.levelap.blog.entity.BlogExtra;
@@ -54,6 +55,12 @@ public class BlogOpenController {
 		article.setPrevArticleId(this.blogService.getBlogArticleRepo().findPrevId(article.getId()));
 		article.setPrevArticleTitle(this.blogService.getBlogArticleRepo().findArtitleTitle(article.getPrevArticleId()));
 		return new ResponseEntity<BlogArticle>(article, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="findOneMetaTags/{id}", method=RequestMethod.GET)
+	public ResponseEntity<BlogArticleMetaTags> findOneMetaTags(@PathVariable Long id) {
+		BlogArticleMetaTags article = blogService.getBlogArticleRepo().findOneById(id);
+		return new ResponseEntity<BlogArticleMetaTags>(article, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "getCategories", method = RequestMethod.GET)

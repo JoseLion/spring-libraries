@@ -3,8 +3,6 @@ package ec.com.levelap.blog.entity;
 import java.util.Date;
 import java.util.List;
 
-import org.postgresql.geometric.PGline;
-
 import ec.com.levelap.commons.archive.Archive;
 
 public interface BlogArticleOpen {
@@ -26,9 +24,8 @@ public interface BlogArticleOpen {
 	public void setTags(List<BlogExtra> tags);
 
 	public String getSummary();
-
-	public PGline getDiamondCrop();
-
-	public PGline getSquareCrop();
-
+	
+	public Archive getDiamond();
+	
+	public Archive getSquare();
 }

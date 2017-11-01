@@ -56,8 +56,8 @@ public class BlogController {
 	}
 	
 	@RequestMapping(value="saveArticle", method=RequestMethod.POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> saveArticle(@RequestPart BlogArticle article, @RequestPart(required=false) MultipartFile banner) throws ServletException, IOException {
-		return blogService.saveArticle(article, banner);
+	public ResponseEntity<?> saveArticle(@RequestPart BlogArticle article, @RequestPart(required=false) MultipartFile banner, @RequestPart(required=false) MultipartFile diamond, @RequestPart(required=false) MultipartFile square) throws ServletException, IOException {
+		return blogService.saveArticle(article, banner, diamond, square);
 	}
 	
 	@RequestMapping(value="changeArticleStatus/{id}", method=RequestMethod.GET)

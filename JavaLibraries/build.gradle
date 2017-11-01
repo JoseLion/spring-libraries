@@ -23,6 +23,7 @@ jar {
 	baseName = 'Levelap'
 	version = '0.0.1'
 }
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -32,6 +33,11 @@ repositories {
 	maven { url "https://repo.spring.io/milestone" }
 }
 
+configurations {
+	providedRuntime
+	jaxb
+	ws
+}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web') {
@@ -45,6 +51,26 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.hibernate:hibernate-core')
 	compile('org.postgresql:postgresql')
+	compile("org.springframework.ws:spring-ws-core")
+	jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
+	
+	ws "org.apache.cxf:cxf-tools:2.5.1",
+		"org.apache.cxf:cxf-tools-wsdlto-databinding-jaxb:2.5.1",
+		"org.apache.cxf:cxf-tools-wsdlto-frontend-jaxws:2.5.1",
+		"log4j:log4j:1.2.17"
+	
 	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
+
+ext.wsldMethod = { webService ->
+	javaexec {
+		classpath configurations.ws
+		main = 'org.apache.cxf.tools.wsdlto.WSDLToJava'
+		args = ['-d', 'src/main/java', '-p', 'http://clientes.tcc.com.co/=ec.com.levelap.tcc.wsdl.clientes', '-p', 'http://www.tcc.com.co/xsd=ec.com.levelap.tcc.wsdl.xsd', 'http://clientes.tcc.com.co/servicios/' + webService + '.asmx?WSDL']
+		systemProperties = ['exitOnFinish':'TRUE']
+	}
+}
+
+project.wsldMethod("wsDespachos")
+project.wsldMethod("InformacionRemesas")

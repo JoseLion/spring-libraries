@@ -15,8 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.postgresql.geometric.PGline;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import ec.com.levelap.base.entity.BaseEntity;
@@ -28,6 +26,9 @@ import ec.com.levelap.commons.archive.Archive;
 public class BlogArticle extends BaseEntity {
 	@Column(columnDefinition="VARCHAR", nullable=false)
 	private String title;
+	
+	@Column(columnDefinition="VARCHAR")
+	private String keywords;
 	
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinColumn(name="banner", foreignKey=@ForeignKey(name="banner_archive_fk"))
@@ -56,11 +57,13 @@ public class BlogArticle extends BaseEntity {
 	@Column(name="times_seen", columnDefinition="INTEGER DEFAULT 0")
 	private Integer timesSeen = 0;
 	
-	@Column(name="diamond_crop")
-	private PGline diamondCrop;
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinColumn(name="square", foreignKey=@ForeignKey(name="square_archive_fk"))
+	private Archive square;
 	
-	@Column(name="square_crop")
-	private PGline squareCrop;
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinColumn(name="diamond", foreignKey=@ForeignKey(name="dimond_archive_fk"))
+	private Archive diamond;
 	
 	@Transient
 	private Long nextArticleId;
@@ -76,6 +79,14 @@ public class BlogArticle extends BaseEntity {
 
 	public String getTitle() {
 		return title;
+	}
+
+	public String getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
 	}
 
 	public void setTitle(String title) {
@@ -146,20 +157,20 @@ public class BlogArticle extends BaseEntity {
 		this.timesSeen = timesSeen;
 	}
 
-	public PGline getDiamondCrop() {
-		return diamondCrop;
+	public Archive getSquare() {
+		return square;
 	}
 
-	public void setDiamondCrop(PGline diamondCrop) {
-		this.diamondCrop = diamondCrop;
+	public void setSquare(Archive square) {
+		this.square = square;
 	}
 
-	public PGline getSquareCrop() {
-		return squareCrop;
+	public Archive getDiamond() {
+		return diamond;
 	}
 
-	public void setSquareCrop(PGline squareCrop) {
-		this.squareCrop = squareCrop;
+	public void setDiamond(Archive diamond) {
+		this.diamond = diamond;
 	}
 
 	public Long getNextArticleId() {

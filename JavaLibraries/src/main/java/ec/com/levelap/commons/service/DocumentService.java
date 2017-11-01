@@ -48,6 +48,7 @@ public class DocumentService {
 		}
 		
 		String fileName = renameIfDuplicate(path.toString(), file.getOriginalFilename(), 0);
+		fileName = fileName.trim().replace(" ", "");
 		path.append(fileName);
 		
 		File serverFile = new File(path.toString());
@@ -128,7 +129,7 @@ public class DocumentService {
 			}
 			
 			if (openIndex != 0 && closeIndex != 0 && isInteger(name.substring(openIndex, closeIndex))) {
-				name = name.substring(0, openIndex-1) + " (" + counter + ")" + name.substring(closeIndex+1);
+				name = name.substring(0, openIndex-1) + "(" + counter + ")" + name.substring(closeIndex+1);
 			} else {
 				int dotIndex = 0;
 				for (int i = name.length()-1; i >= 0; i--) {

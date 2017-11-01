@@ -1,11 +1,10 @@
-package ec.com.levelap.mail;
+package ec.com.levelap.mail.entity;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class MailParameters {
+public class LevelapMail {
 
 	private String subject;
 
@@ -16,8 +15,8 @@ public class MailParameters {
 	private List<String> recipentCC = new ArrayList<>();
 
 	private List<String> recipentCCO = new ArrayList<>();
-
-	private Map<String, String> parameters = new HashMap<>();
+	
+	private List<File> attachments = new ArrayList<>();
 
 	public String getSubject() {
 		return subject;
@@ -59,11 +58,11 @@ public class MailParameters {
 		this.recipentCCO = recipentCCO;
 	}
 
-	public Map<String, String> getParameters() {
-		return parameters;
+	public List<File> getAttachments() {
+		return attachments;
 	}
 
-	public void setParameters(Map<String, String> parameters) {
-		this.parameters = parameters;
+	public void setAttachments(List<File> attachments) {
+		this.attachments = attachments;
 	}
 }

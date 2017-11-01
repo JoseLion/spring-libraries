@@ -9,7 +9,8 @@ package ec.com.levelap.kushki.object;
 /**
  * Kushki amount object.
  * 
- * @author Luis GarcÃ­a Castro.
+ * @author Luis García Castro. Edit: José Luis León
+ * 
  */
 public class KushkiAmount {
 
@@ -27,6 +28,15 @@ public class KushkiAmount {
 	 * {@link KushkiAmount} default constructor.
 	 */
 	public KushkiAmount() {
+	}
+	
+	/**
+	 * {@link KushkiAmount} constructor with parameters.
+	 * 
+	 * @param subtotalIva
+	 */
+	public KushkiAmount(Double subtotalIva) {
+		this.subtotalIva = subtotalIva;
 	}
 
 	/**

@@ -21,7 +21,7 @@ public class BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "id", nullable = false)
-	private Long id;
+	protected Long id;
 
 	@Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
 	protected Boolean status = true;
@@ -88,8 +88,8 @@ public class BaseEntity {
 
 	@PrePersist
 	protected void onCreate() {
-		LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
 		try {
+			LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
 			this.setCreationUser(levelap.getConfig().getCurrentUser());
 		} catch (Exception ex) {
 			this.setCreationUser(-1L);
@@ -98,9 +98,10 @@ public class BaseEntity {
 
 	@PreUpdate
 	protected void onUpdate() {
-		LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
 		this.setUpdateDate(new Date());
+		
 		try {
+			LevelapBase levelap = LevelapBaseContextHolder.getContext().getBean(LevelapBase.class);
 			this.setUpdateUser(levelap.getConfig().getCurrentUser());
 		} catch (Exception ex) {
 			this.setUpdateUser(-1L);

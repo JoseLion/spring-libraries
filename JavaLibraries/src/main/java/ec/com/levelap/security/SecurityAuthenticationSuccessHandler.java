@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CsrfToken;
 
 public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 	@Autowired
@@ -31,9 +32,11 @@ public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticatio
 			}
 		}
 		
+		CsrfToken token = (CsrfToken)request.getAttribute("_csrf");
+		
 		response.setContentType(SecurityConst.TEXT_UTF8_HEADER);
 		response.setStatus(HttpServletResponse.SC_OK);
-		response.getWriter().print(SecurityConst.OK);
+		response.getWriter().print(token.getToken());
         response.flushBuffer();
         
         levelapSecurity.getConfig().handleSuccess();

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import ec.com.levelap.blog.entity.BlogArticle;
 import ec.com.levelap.blog.entity.BlogArticleLite;
+import ec.com.levelap.blog.entity.BlogArticleMetaTags;
 import ec.com.levelap.blog.entity.BlogArticleOpen;
 import ec.com.levelap.blog.entity.BlogExtra;
 
@@ -55,8 +56,8 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 			+ "     a.banner AS banner, "
 			+ "     a.author AS author, "
 			+ "     a.summary AS summary, "
-			+ "     a.diamondCrop AS diamondCrop, "
-			+ "     a.squareCrop AS squareCrop "
+			+ "		a.square AS square, "
+			+ "		a.diamond AS diamond "
 			+ "FROM BlogArticle a "
 			+ "     LEFT JOIN a.category c "
 			+ "     LEFT JOIN a.tags t "
@@ -103,8 +104,8 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 			+ "     a.banner AS banner, "
 			+ "     a.author AS author, "
 			+ "     a.summary AS summary, "
-			+ "     a.diamondCrop AS diamondCrop, "
-			+ "     a.squareCrop AS squareCrop "
+			+ "     a.diamond AS diamond, "
+			+ "     a.square AS square "
 			+ "FROM BlogArticle a "
 			+ "     LEFT JOIN a.category c "
 			+ "     LEFT JOIN a.tags t "
@@ -120,4 +121,5 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 			+ "ORDER BY a.creationDate DESC ")
 	public Page<BlogArticleOpen> searchArticles(String text, Pageable page);
 	
+	public BlogArticleMetaTags findOneById(Long id);
 }
