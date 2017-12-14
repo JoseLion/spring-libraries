@@ -1,6 +1,6 @@
 package ec.com.levelap.blog.entity;
 
-import ec.com.levelap.commons.archive.Archive;
+import ec.com.levelap.archive.Archive;
 
 public interface BlogArticleMetaTags {
 	public String getTitle();

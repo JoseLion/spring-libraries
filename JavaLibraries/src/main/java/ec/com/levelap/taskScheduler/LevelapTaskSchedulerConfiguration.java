@@ -14,7 +14,7 @@ public class LevelapTaskSchedulerConfiguration {
 	}
 
 	@Bean
-	public LevelapTaskScheduler smartbidTaskScheduler() {
+	public LevelapTaskScheduler levelapTaskScheduler() {
 		return new LevelapTaskScheduler(taskScheduler());
 	}
 }

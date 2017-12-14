@@ -1,4 +1,4 @@
-package ec.com.levelap.commons.service;
+package ec.com.levelap.archive;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -8,23 +8,37 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import ec.com.levelap.base.entity.FileData;
 
 @Service
-public class DocumentService {
+public class ArchiveService {
+	@Autowired
+	private ArchiveRepo archiveRepository;
+	
 	@Autowired
 	private Environment environment;
 
 	@Value("${levelap.file.environment}")
 	private String fileEnvironment;
-
+	
+	public void downloadFile(String name, String module, HttpServletResponse response) throws ServletException, IOException {
+		InputStream inputStream = new FileInputStream(this.getFile(name, module));
+		response.setHeader("Content-Disposition", String.format("inline; filename=\"" + name + "\""));
+		response.setContentType("application/octet-stream");
+		FileCopyUtils.copy(inputStream, response.getOutputStream());
+		response.flushBuffer();
+		inputStream.close();
+	}
+	
 	public FileData saveFile(MultipartFile file, String module) throws IOException, ServletException {
 		if (environment.getProperty(fileEnvironment) == null) {
 			throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO ".concat(fileEnvironment).concat(" EN SU EQUIPO"));
@@ -65,7 +79,7 @@ public class DocumentService {
 		return fileData;
 	}
 	
-	public InputStream getFile(String name, String module) throws IOException {
+	public File getFile(String name, String module) throws IOException {
 		if (environment.getProperty(fileEnvironment) == null) {
 			throw new IOException("NO SE PUDO ENCOTRAR LA VARIABLE DE ENTORNO ".concat(fileEnvironment).concat(" EN SU EQUIPO"));
 		}
@@ -79,9 +93,7 @@ public class DocumentService {
 		}
 		
 		path.append(name);
-		File file = new File(path.toString());
-		
-		return new FileInputStream(file);
+		return new File(path.toString());
 	}
 
 	public boolean deleteFile(String name, String module) throws IOException {
@@ -146,45 +158,6 @@ public class DocumentService {
 		}
 		
 		return name;
-		
-		/*File serverFile = new File(path);
-		String[] split = null;
-		if (serverFile.exists()) {
-			try {
-				String[] splitAuxOpen = path.split("\\(");
-				if (splitAuxOpen != null && splitAuxOpen.length > 0) {
-					String[] splitAuxClose = splitAuxOpen[splitAuxOpen.length - 1].split("\\)");
-					if (splitAuxOpen.length > 1) {
-						counter = Integer.parseInt(splitAuxClose[splitAuxClose.length - 2]);
-					}
-				}
-			} catch (PatternSyntaxException | NumberFormatException ex) {
-			}
-			path = path.replace("(" + counter + ")", "");
-			split = path.split("\\.");
-			if (split.length < 1) {
-				throw new ServletException("El archivo no contiene extensión.");
-			}
-			split[split.length - 2] = split[split.length - 2] + "(" + (++counter) + ")";
-			StringBuilder fullName = new StringBuilder();
-			for (int i = 0; i < split.length; i++) {
-				fullName.append(split[i]);
-				if (i != (split.length - 1)) {
-					fullName.append(".");
-				}
-			}
-			return renameIfDuplicate(fullName.toString(), counter);
-		}
-
-		FileData fileData = new FileData();
-		fileData.setPath(path);
-		if (File.separator.equals("\\")) {
-			split = path.toString().split("\\\\");
-		} else {
-			split = path.toString().split(File.separator);
-		}
-		fileData.setName(split[split.length - 1]);
-		return fileData;*/
 	}
 	
 	private boolean isInteger(String value) {
@@ -199,5 +172,9 @@ public class DocumentService {
 		} catch (NumberFormatException e) {
 			return false;
 		}
+	}
+
+	public ArchiveRepo getArchiveRepository() {
+		return archiveRepository;
 	}
 }

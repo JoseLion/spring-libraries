@@ -23,6 +23,7 @@ import ec.com.levelap.blog.entity.BlogArticleMetaTags;
 import ec.com.levelap.blog.entity.BlogArticleOpen;
 import ec.com.levelap.blog.entity.BlogComment;
 import ec.com.levelap.blog.entity.BlogExtra;
+import ec.com.levelap.blog.entity.BlogTag;
 import ec.com.levelap.blog.service.BlogService;
 
 @RestController
@@ -105,7 +106,8 @@ public class BlogOpenController {
 	public ResponseEntity<?> findArticles(@RequestBody Search search) throws ServletException {
 		if (search.isHomePage != null && search.isHomePage) {
 			Page<BlogArticleOpen> articles = this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, homePageSize));
-			return new ResponseEntity<>(this.setTagsOnOpen(articles), HttpStatus.OK);
+			this.setTagsOnOpen(articles);
+			return new ResponseEntity<>(articles, HttpStatus.OK);
 		} else if (search.isFeatured != null && search.isFeatured) {
 			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, importantSize)), HttpStatus.OK);
 		} else if (search.isMostSeen != null && search.isMostSeen) {
@@ -115,20 +117,23 @@ public class BlogOpenController {
 				search.text = "";
 			}
 			Page<BlogArticleOpen> articles = this.blogService.getBlogArticleRepo().searchArticles(search.text, new PageRequest(search.page, searchSize));
-			return new ResponseEntity<>(this.setTagsOnOpen(articles), HttpStatus.OK);
+			this.setTagsOnOpen(articles);
+			return new ResponseEntity<>(articles, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 	
-	private Page<BlogArticleOpen> setTagsOnOpen(Page<BlogArticleOpen> articles) {
-		articles.getContent().forEach(article -> {
+	private void setTagsOnOpen(Page<BlogArticleOpen> articles) {
+		for (BlogArticleOpen article : articles.getContent()) {
+			List<BlogTag> tags = blogService.getBlogTagRepo().findByBlogArticleId(article.getId());
 			List<BlogExtra> extras = new ArrayList<>();
-			this.blogService.getBlogTagRepo().findByBlogArticleId(article.getId()).forEach(tag -> {
-				extras.add(tag.getBlogExtra());
-			});
+			
+			for (int i = 0; i < tags.size(); i++) {
+				extras.add(tags.get(i).getBlogExtra());
+			}
+			
 			article.setTags(extras);
-		});
-		return articles;
+		}
 	}
 
 	private static class Search {

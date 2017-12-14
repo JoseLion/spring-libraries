@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import ec.com.levelap.archive.Archive;
+import ec.com.levelap.archive.ArchiveService;
 import ec.com.levelap.base.entity.ErrorControl;
 import ec.com.levelap.base.entity.FileData;
 import ec.com.levelap.blog.entity.BlogArticle;
@@ -20,8 +22,6 @@ import ec.com.levelap.blog.repository.BlogArticleRepo;
 import ec.com.levelap.blog.repository.BlogCommentRepo;
 import ec.com.levelap.blog.repository.BlogExtraRepo;
 import ec.com.levelap.blog.repository.BlogTagRepo;
-import ec.com.levelap.commons.archive.Archive;
-import ec.com.levelap.commons.service.DocumentService;
 
 @Service
 public class BlogService {
@@ -38,7 +38,7 @@ public class BlogService {
 	private BlogTagRepo blogTagRepo;
 	
 	@Autowired
-	public DocumentService documentService;
+	public ArchiveService archiveService;
 
 	public BlogArticleRepo getBlogArticleRepo() {
 		return blogArticleRepo;
@@ -63,11 +63,11 @@ public class BlogService {
 			
 			if (article.getId() != null) {
 				BlogArticle original = blogArticleRepo.findOne(article.getId());
-				documentService.deleteFile(original.getBanner().getName(), BlogArticle.class.getSimpleName());
+				archiveService.deleteFile(original.getBanner().getName(), BlogArticle.class.getSimpleName());
 				archive = original.getBanner();
 			}
 			
-			FileData fileData = documentService.saveFile(banner, BlogArticle.class.getSimpleName());
+			FileData fileData = archiveService.saveFile(banner, BlogArticle.class.getSimpleName());
 			
 			archive.setModule(BlogArticle.class.getSimpleName());
 			archive.setName(fileData.getName());
@@ -82,12 +82,12 @@ public class BlogService {
 				BlogArticle original = blogArticleRepo.findOne(article.getId());
 				
 				if (original.getDiamond() != null) {
-					documentService.deleteFile(original.getDiamond().getName(), BlogArticle.class.getSimpleName());
+					archiveService.deleteFile(original.getDiamond().getName(), BlogArticle.class.getSimpleName());
 					archive = original.getDiamond();
 				}
 			}
 			
-			FileData fileData = documentService.saveFile(diamond, BlogArticle.class.getSimpleName());
+			FileData fileData = archiveService.saveFile(diamond, BlogArticle.class.getSimpleName());
 			
 			archive.setModule(BlogArticle.class.getSimpleName());
 			archive.setName(fileData.getName());
@@ -102,12 +102,12 @@ public class BlogService {
 				BlogArticle original = blogArticleRepo.findOne(article.getId());
 				
 				if (original.getSquare() != null) {
-					documentService.deleteFile(original.getSquare().getName(), BlogArticle.class.getSimpleName());
+					archiveService.deleteFile(original.getSquare().getName(), BlogArticle.class.getSimpleName());
 					archive = original.getSquare();
 				}
 			}
 			
-			FileData fileData = documentService.saveFile(square, BlogArticle.class.getSimpleName());
+			FileData fileData = archiveService.saveFile(square, BlogArticle.class.getSimpleName());
 			
 			archive.setModule(BlogArticle.class.getSimpleName());
 			archive.setName(fileData.getName());

@@ -1,12 +1,10 @@
-package ec.com.levelap.commons.archive;
+package ec.com.levelap.archive;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import ec.com.levelap.base.entity.BaseEntity;
 
 @Entity
 @Table(schema="commons", name="archive")

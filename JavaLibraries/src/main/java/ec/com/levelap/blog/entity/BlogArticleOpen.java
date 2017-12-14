@@ -3,7 +3,7 @@ package ec.com.levelap.blog.entity;
 import java.util.Date;
 import java.util.List;
 
-import ec.com.levelap.commons.archive.Archive;
+import ec.com.levelap.archive.Archive;
 
 public interface BlogArticleOpen {
 
