@@ -48,7 +48,7 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 		Pageable page
 	);
 
-	@Query(value = "SELECT DISTINCT "
+	/*@Query(value = "SELECT DISTINCT "
 			+ "     a.id AS id, "
 			+ "     a.title AS title, "
 			+ "     a.creationDate AS creationDate, "
@@ -69,7 +69,7 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 	public Page<BlogArticleOpen> findArticles(
 			@Param("isFeatured") Boolean isFeatured,
 			@Param("isMostSeen") Boolean isMostSeen,
-			Pageable page);
+			Pageable page);*/
 
 	@Query(value = "SELECT a.title FROM BlogArticle a WHERE a.id = ?1")
 	public String findArtitleTitle(Long id);
@@ -96,30 +96,34 @@ public interface BlogArticleRepo extends JpaRepository<BlogArticle, Long> {
 			+ "WHERE a.id = ?1", nativeQuery = true)
 	public Long findPrevId(Long id);
 	
-	@Query(value = "SELECT DISTINCT "
-			+ "     a.id AS id, "
-			+ "     a.title AS title, "
-			+ "     a.creationDate AS creationDate, "
-			+ "     c AS category, "
-			+ "     a.banner AS banner, "
-			+ "     a.author AS author, "
-			+ "     a.summary AS summary, "
-			+ "     a.diamond AS diamond, "
-			+ "     a.square AS square "
-			+ "FROM BlogArticle a "
-			+ "     LEFT JOIN a.category c "
-			+ "     LEFT JOIN a.tags t "
-			+ "WHERE "
-			+ "     a.status IS TRUE "
-			+ "     AND ("
-			+ "          UPPER(a.title) LIKE '%' || UPPER(?1) || '%' "
-			+ "          OR UPPER(a.body) LIKE '%' || UPPER(?1) || '%' "
-			+ "          OR UPPER(a.summary) LIKE '%' || UPPER(?1) || '%' "
-			+ "          OR UPPER(c.text) LIKE '%' || UPPER(?1) || '%' "
-			+ "          OR UPPER(t.text) LIKE '%' || UPPER(?1) || '%' "
-			+ "     ) "
-			+ "ORDER BY a.creationDate DESC ")
-	public Page<BlogArticleOpen> searchArticles(String text, Pageable page);
+	@Query("SELECT DISTINCT " +
+				"a.id AS id, " +
+				"a.title AS title, " +
+				"a.creationDate AS creationDate, " +
+				"c AS category, " +
+				"a.banner AS banner, " +
+				"a.author AS author, " +
+				"a.summary AS summary, " +
+				"a.diamond AS diamond, " +
+				"a.square AS square " +
+			"FROM BlogArticle a " +
+				"LEFT JOIN a.category c " +
+				"LEFT JOIN a.tags t " +
+			"WHERE " +
+				"a.status IS TRUE AND " +
+				"(UPPER(a.title) LIKE UPPER('%' || :text || '%') OR " +
+				"UPPER(a.body) LIKE UPPER('%' || :text || '%') OR " +
+				"UPPER(a.summary) LIKE UPPER('%' || :text || '%') OR " +
+				"UPPER(c.text) LIKE UPPER('%' || :text || '%') OR " +
+				"UPPER(t.text) LIKE UPPER('%' || :text || '%')) AND " +
+				"(:isFeatured IS NULL OR a.isFeatured=:isFeatured) AND " +
+				"(:isMostSeen IS NULL OR a.timesSeen > 0) " +
+			"ORDER BY a.creationDate DESC ")
+	public Page<BlogArticleOpen> findArticles(
+			@Param("text") String text,
+			@Param("isFeatured") Boolean isFeatured,
+			@Param("isMostSeen") Boolean isMostSeen,
+			Pageable page);
 	
 	public BlogArticleMetaTags findOneById(Long id);
 }

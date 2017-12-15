@@ -1,6 +1,5 @@
 package ec.com.levelap.blog.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -23,7 +22,6 @@ import ec.com.levelap.blog.entity.BlogArticleMetaTags;
 import ec.com.levelap.blog.entity.BlogArticleOpen;
 import ec.com.levelap.blog.entity.BlogComment;
 import ec.com.levelap.blog.entity.BlogExtra;
-import ec.com.levelap.blog.entity.BlogTag;
 import ec.com.levelap.blog.service.BlogService;
 
 @RestController
@@ -103,37 +101,31 @@ public class BlogOpenController {
 	}
 
 	@RequestMapping(value = "findArticles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> findArticles(@RequestBody Search search) throws ServletException {
+	public ResponseEntity<Page<BlogArticleOpen>> findArticles(@RequestBody(required=false) Search search) throws ServletException {
+		Integer pageSize = 20;
+		
+		if (search == null) {
+			search = new Search();
+		}
+		
 		if (search.isHomePage != null && search.isHomePage) {
-			Page<BlogArticleOpen> articles = this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, homePageSize));
-			this.setTagsOnOpen(articles);
-			return new ResponseEntity<>(articles, HttpStatus.OK);
+			pageSize = homePageSize;
 		} else if (search.isFeatured != null && search.isFeatured) {
-			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, importantSize)), HttpStatus.OK);
+			pageSize = importantSize;
 		} else if (search.isMostSeen != null && search.isMostSeen) {
-			return new ResponseEntity<>(this.blogService.getBlogArticleRepo().findArticles(search.isFeatured, search.isMostSeen, new PageRequest(search.page, mostSeenSize)), HttpStatus.OK);
+			pageSize = mostSeenSize;
 		} else if (search.isSearch != null && search.isSearch) {
-			if(search.text == null) {
-				search.text = "";
-			}
-			Page<BlogArticleOpen> articles = this.blogService.getBlogArticleRepo().searchArticles(search.text, new PageRequest(search.page, searchSize));
-			this.setTagsOnOpen(articles);
-			return new ResponseEntity<>(articles, HttpStatus.OK);
+			pageSize = searchSize;
 		}
-		return new ResponseEntity<>(null, HttpStatus.OK);
-	}
-	
-	private void setTagsOnOpen(Page<BlogArticleOpen> articles) {
+		
+		Page<BlogArticleOpen> articles = this.blogService.getBlogArticleRepo().findArticles(search.text, search.isFeatured, search.isMostSeen, new PageRequest(search.page, pageSize));
+		
 		for (BlogArticleOpen article : articles.getContent()) {
-			List<BlogTag> tags = blogService.getBlogTagRepo().findByBlogArticleId(article.getId());
-			List<BlogExtra> extras = new ArrayList<>();
-			
-			for (int i = 0; i < tags.size(); i++) {
-				extras.add(tags.get(i).getBlogExtra());
-			}
-			
-			article.setTags(extras);
+			BlogArticle fullArticle = blogService.getBlogArticleRepo().findOne(article.getId());
+			article.setTags(fullArticle.getTags());
 		}
+		
+		return new ResponseEntity<>(articles, HttpStatus.OK);
 	}
 
 	private static class Search {
@@ -146,7 +138,7 @@ public class BlogOpenController {
 
 		public Boolean isSearch;
 
-		public String text;
+		public String text = "";
 
 		public Integer page = 0;
 

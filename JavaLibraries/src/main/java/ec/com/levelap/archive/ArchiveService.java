@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Normalizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -62,6 +63,7 @@ public class ArchiveService {
 		}
 		
 		String fileName = renameIfDuplicate(path.toString(), file.getOriginalFilename(), 0);
+		fileName = Normalizer.normalize(fileName, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 		fileName = fileName.trim().replace(" ", "");
 		path.append(fileName);
 		
