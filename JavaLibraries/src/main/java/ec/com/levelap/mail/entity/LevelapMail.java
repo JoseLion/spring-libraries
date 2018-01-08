@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LevelapMail {
+	
+	private String from;
 
 	private String subject;
 
@@ -17,6 +19,14 @@ public class LevelapMail {
 	private List<String> recipentCCO = new ArrayList<>();
 	
 	private List<File> attachments = new ArrayList<>();
+
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
+	}
 
 	public String getSubject() {
 		return subject;

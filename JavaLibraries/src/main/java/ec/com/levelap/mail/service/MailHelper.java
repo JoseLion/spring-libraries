@@ -52,6 +52,10 @@ public class MailHelper {
 		helper.setSubject(levelapMail.getSubject());
 		helper.setText(levelapMail.getContent(), true);
 		
+		if (levelapMail.getFrom() != null && !levelapMail.getFrom().isEmpty()) {
+			helper.setFrom(new InternetAddress(levelapMail.getFrom()));
+		}
+		
 		mailSender.send(message);
 	}
 
