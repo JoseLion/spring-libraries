@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.Normalizer;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +63,7 @@ public class ArchiveService {
 			path.append(File.separator);
 		}
 		
-		String fileName = renameIfDuplicate(path.toString(), file.getOriginalFilename(), 0);
+		String fileName = renameIfDuplicate(path.toString(), file.getOriginalFilename());
 		fileName = Normalizer.normalize(fileName, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 		fileName = fileName.trim().replace(" ", "");
 		path.append(fileName);
@@ -121,59 +122,17 @@ public class ArchiveService {
 		return false;
 	}
 
-	private String renameIfDuplicate(String path, String name, int counter) throws ServletException {
+	private String renameIfDuplicate(String path, String name) throws ServletException {
 		File file = new File(path + name);
 		
 		if (file.exists()) {
-			counter++;
-			int openIndex = 0;
-			for (int i = 1; i < name.length(); i++) {
-				if (name.substring(i-1, i).equals("(")) {
-					openIndex = i;
-					break;
-				}
-			}
+			int dotIndex = name.lastIndexOf(".");
+			Date today = new Date();
 			
-			int closeIndex = 0;
-			for (int i = 1; i < name.length(); i++) {
-				if (name.substring(i-1, i).equals(")")) {
-					closeIndex = i-1;
-					break;
-				}
-			}
-			
-			if (openIndex != 0 && closeIndex != 0 && isInteger(name.substring(openIndex, closeIndex))) {
-				name = name.substring(0, openIndex-1) + "(" + counter + ")" + name.substring(closeIndex+1);
-			} else {
-				int dotIndex = 0;
-				for (int i = name.length()-1; i >= 0; i--) {
-					if (i-1 >= 0 && name.substring(i-1, i).equals(".")) {
-						dotIndex = i-1;
-						break;
-					}
-				}
-				
-				name = name.substring(0, dotIndex) + " (" + counter + ")" + name.substring(dotIndex);
-			}
-			
-			name = renameIfDuplicate(path, name, counter);
+			return name.substring(0, dotIndex) + "-" + today.getTime() + name.substring(dotIndex);
 		}
 		
 		return name;
-	}
-	
-	private boolean isInteger(String value) {
-		try {
-			int number = Integer.parseInt(value);
-			
-			if (number > 0) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch (NumberFormatException e) {
-			return false;
-		}
 	}
 
 	public ArchiveRepo getArchiveRepository() {

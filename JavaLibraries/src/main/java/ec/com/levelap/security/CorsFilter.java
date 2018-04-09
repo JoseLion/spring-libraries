@@ -3,6 +3,7 @@ package ec.com.levelap.security;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
@@ -71,11 +72,16 @@ public class CorsFilter implements Filter {
 				byte[] array = IOUtils.toByteArray(request.getInputStream());
 				InputStream is = new ByteArrayInputStream(array);
 				
-				GZIPInputStream gzipStream = new GZIPInputStream(is);
-				String gzip = IOUtils.toString(gzipStream);
-				
-				if (!gzip.equals("")) {
-					wrappedRequest.resetInputStream(gzip.getBytes());
+				try {
+					GZIPInputStream gzipStream = new GZIPInputStream(is);
+					String gzip = IOUtils.toString(gzipStream, StandardCharsets.UTF_8);
+					
+					if (!gzip.equals("")) {
+						wrappedRequest.resetInputStream(gzip.getBytes());
+					}
+				} catch (Exception e) {
+					String data = IOUtils.toString(is, StandardCharsets.UTF_8);
+					wrappedRequest.resetInputStream(data.getBytes());
 				}
 			} else {
 				isCompressed = false;
@@ -87,7 +93,6 @@ public class CorsFilter implements Filter {
 				} else {
 					chain.doFilter(request, response);
 				}
-				
 			}
 		} else {
 			chain.doFilter(request, response);

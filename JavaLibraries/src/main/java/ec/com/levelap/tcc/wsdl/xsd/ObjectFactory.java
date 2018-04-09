@@ -30,6 +30,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link TpDocumentoReferencia }
+     * 
+     */
+    public TpDocumentoReferencia createTpDocumentoReferencia() {
+        return new TpDocumentoReferencia();
+    }
+
+    /**
      * Create an instance of {@link TpUnidad }
      * 
      */
@@ -43,14 +51,6 @@ public class ObjectFactory {
      */
     public TpGrabarRemesaCompleta createTpGrabarRemesaCompleta() {
         return new TpGrabarRemesaCompleta();
-    }
-
-    /**
-     * Create an instance of {@link TpDocumentoReferencia }
-     * 
-     */
-    public TpDocumentoReferencia createTpDocumentoReferencia() {
-        return new TpDocumentoReferencia();
     }
 
 }
